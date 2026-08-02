@@ -1,0 +1,44 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "app: dev server",
+      "type": "shell",
+      "command": "npm run dev -- --open",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "options": {
+        "cwd": "${workspaceFolder}/app",
+        // Falls back to the nvm-windows Node 20 install directly, in case this
+        // VS Code window was opened before the system PATH picked it up.
+        "env": {
+          "PATH": "C:\\nvm4w\\nodejs;${env:PATH}"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": {
+          // Vite's dev server has no structured error output to match — only
+          // the background begin/end markers below matter for preLaunchTask.
+          "regexp": "^(never-matches-anything)$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "VITE v",
+          "endsPattern": "ready in"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "runOptions": {
+        "runOn": "default"
+      }
+    }
+  ]
+}

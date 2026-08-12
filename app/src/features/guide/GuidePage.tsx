@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { SectionHeader } from '../../components/layout/SectionHeader';
 import { TabBar } from '../../components/layout/TabBar';
+import { Callout } from '../../components/ui/Callout';
 import { AllianceDuelTab } from './tabs/AllianceDuelTab';
 import { BuildingsTab } from './tabs/BuildingsTab';
 import { CombatTab } from './tabs/CombatTab';
@@ -15,7 +16,7 @@ import { TechnologiesTab } from './tabs/TechnologiesTab';
 const TABS = [
   { to: '/guide/heroes', label: 'Герои' },
   { to: '/guide/equipment', label: 'Снаряжение' },
-  { to: '/guide/raven', label: 'Raven' },
+  { to: '/guide/raven', label: 'Ворон' },
   { to: '/guide/technologies', label: 'Технологии' },
   { to: '/guide/soldiers', label: 'Войска' },
   { to: '/guide/buildings', label: 'Постройки' },
@@ -33,6 +34,9 @@ export function GuidePage() {
         title="Last Asylum: Plague"
         sub="Справочник по игре"
       />
+      <Callout kind="info">
+        Раздел находится в разработке — информация в гайде может быть неактуальной.
+      </Callout>
       <TabBar tabs={TABS} />
       <Routes>
         <Route index element={<Navigate to="heroes" replace />} />

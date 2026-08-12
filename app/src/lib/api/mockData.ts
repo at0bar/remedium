@@ -22,6 +22,7 @@ export const mockProfile: ProfileData = {
     avgDuelRank: 11,
     strongerThanPercent: 80,
     lastCoachmanDate: '2026-07-21',
+    weeklyPowerChangePercent: 4.2,
   },
 };
 

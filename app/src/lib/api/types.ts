@@ -12,6 +12,8 @@ export interface ProfileStats {
   avgDuelRank: number;
   strongerThanPercent: number;
   lastCoachmanDate: string;
+  /** Change in total squad power vs. the previous week, in percent. */
+  weeklyPowerChangePercent: number;
 }
 
 export interface ProfileData {

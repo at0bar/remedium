@@ -3,7 +3,7 @@ import { Callout } from '../../../components/ui/Callout';
 import { Card, CardTitle } from '../../../components/ui/Card';
 import { StatTile } from '../../../components/ui/StatTile';
 import { useProfile } from '../../../lib/api/hooks';
-import { formatDate, formatPowerM, sumPowerM } from '../../../lib/format';
+import { formatDate, formatPercentChange, formatPowerM, sumPowerM } from '../../../lib/format';
 
 export function OverviewTab() {
   const { data: profile, isLoading } = useProfile();
@@ -33,7 +33,12 @@ export function OverviewTab() {
 
       <div className="g-auto">
         <StatTile value={String(profile.level)} label="Уровень" sub={`Ранг ${profile.group}`} />
-        <StatTile value={formatPowerM(totalPower)} label="Суммарная мощь" />
+        <StatTile
+          value={formatPowerM(totalPower)}
+          label="Суммарная мощь"
+          sub={`${formatPercentChange(profile.stats.weeklyPowerChangePercent)} за неделю`}
+          subTone="positive"
+        />
         <StatTile value={profile.playstyle} label="Стиль игры" />
         <StatTile value={`${profile.coords.x}:${profile.coords.y}`} label="Координаты" sub={`Мифриловый зал`} />
       </div>

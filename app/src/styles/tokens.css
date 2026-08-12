@@ -50,4 +50,10 @@
   --teal-dim: rgba(62, 207, 178, 0.08);
   --purple: #a78bfa;
   --purple-dim: rgba(167, 139, 250, 0.08);
+
+  /* World-map region colours — factual map data, not a faction/class/status signal.
+     --map-neighbor coincidentally shares --warlock's hex; kept as a separate token
+     per DESIGN.md's own rule on such coincidences. */
+  --map-us: var(--gold);
+  --map-neighbor: #4caf7a;
 }

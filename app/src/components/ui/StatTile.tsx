@@ -1,9 +1,19 @@
-export function StatTile({ value, label, sub }: { value: string; label: string; sub?: string }) {
+export function StatTile({
+  value,
+  label,
+  sub,
+  subTone = 'muted',
+}: {
+  value: string;
+  label: string;
+  sub?: string;
+  subTone?: 'muted' | 'positive';
+}) {
   return (
     <div className="stat-tile">
       <div className="stat-l">{label}</div>
       <div className="stat-n">{value}</div>
-      {sub && <div className="stat-sub">{sub}</div>}
+      {sub && <div className={`stat-sub${subTone !== 'muted' ? ` ${subTone}` : ''}`}>{sub}</div>}
     </div>
   );
 }

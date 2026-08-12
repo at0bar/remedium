@@ -3,6 +3,7 @@ import {
   mockAlliancePlayers,
   mockCaravan,
   mockElixirRace,
+  mockFormationTiles,
   mockProfile,
   mockWeeklyRating,
   ratingWeeks,
@@ -28,6 +29,10 @@ export function useCaravan() {
 
 export function useElixirRace() {
   return useQuery({ queryKey: ['alliance', 'elixir-race'], queryFn: () => mockFetch(mockElixirRace) });
+}
+
+export function useFormation() {
+  return useQuery({ queryKey: ['alliance', 'formation'], queryFn: () => mockFetch(mockFormationTiles) });
 }
 
 export function useWeeklyRating() {

@@ -1001,8 +1001,8 @@ tbody td:first-child {
   overflow: hidden;
   margin-bottom: 20px;
   /* Single coordinate grid for the whole panel — must stay in phase with the
-     formation canvas's origin: region-map-content padding (20/56) + the
-     canvas's own margin (34/20) from CoordinateFormationGrid.tsx = 54/76. */
+     formation canvas's origin: MARGIN_LEFT/MARGIN_TOP (54/76) from
+     CoordinateFormationGrid.tsx. */
   background-image: linear-gradient(var(--border2) 1px, transparent 1px),
     linear-gradient(90deg, var(--border2) 1px, transparent 1px),
     linear-gradient(var(--border) 1px, transparent 1px),
@@ -1012,7 +1012,6 @@ tbody td:first-child {
 }
 .region-map-content {
   position: relative;
-  padding: 56px 20px 20px 20px;
 }
 .region-line {
   position: absolute;

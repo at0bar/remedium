@@ -44,6 +44,18 @@ export interface CaravanEntry {
   lastAssignedDate: string;
 }
 
+export type FormationRole = 'attacker' | 'mixed' | 'defender' | 'none';
+
+export interface FormationTile {
+  x: number;
+  y: number;
+  nick: string;
+  /** Raw power value as shown on the source screenshot — unit wasn't labeled there, kept as-is. */
+  power: number | null;
+  role: FormationRole;
+  isSelf?: boolean;
+}
+
 export type ElixirTeam = 'Основа А' | 'Основа Б' | 'Резерв А' | 'Резерв Б' | 'Не зарегистрирован';
 export type ElixirParticipation = 'Да' | 'Нет' | 'Не знает';
 

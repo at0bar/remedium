@@ -208,6 +208,13 @@ The only motion in the system is a **fade-up reveal**: elements translate 12px u
 ### Event / Minister Cards
 - Same card shell as standard cards, but with an internal header strip (border-bottom separated) holding the title + inline type tag, and a body section below — used for anything with a distinct "name" + "details" structure (events, minister buffs).
 
+### CRUD Action Icons (Edit / Delete / Save / Cancel)
+- Everywhere a row/card can be edited, added, or removed (players table, squad cards, settings fields, and every future CRUD list), the four core actions are **icon-only, never text labels** — a text button per row reads as heavy and inconsistent once a list has more than a couple of entries.
+- Icon set lives in `components/ui/ActionIcons.tsx`: `EditIcon` (pencil), `TrashIcon` (trash can), `SaveIcon` (floppy disk), `CancelIcon` (crossed circle). Same 14px, `stroke: currentColor`, `strokeWidth: 1.8` line-icon style as the sidebar's `NavIcons`.
+- Rendered via `<Button iconOnly>` (`components/ui/Button.tsx`), which applies the compact `.btn-icon` padding on top of the normal dim-fill `.btn-*` variant. Variant mapping is fixed: Edit → `neutral`, Delete → `red`, Save → `gold`, Cancel → `neutral`.
+- Always pair the icon with both `aria-label` and `title` set to the Russian verb ("Редактировать", "Удалить", "Сохранить", "Отмена") — the icon carries no text, so these are the only accessible/hover-visible names.
+- In a table, the actions column is fixed-width and right-aligned (`.tbl-actions` class) and the table uses `table-layout: fixed` (`.tbl-fixed`) with an explicit `<colgroup>` — this keeps every column's width identical whether a row is in read mode (short text) or edit mode (inputs/selects), so entering edit mode never reflows the table.
+
 ## 6. Do's and Don'ts
 
 ### Do:

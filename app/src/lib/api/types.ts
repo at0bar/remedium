@@ -30,6 +30,7 @@ export interface ProfileData {
 }
 
 export interface AlliancePlayer {
+  id: string;
   nick: string;
   level: number;
   group: PlayerGroup;

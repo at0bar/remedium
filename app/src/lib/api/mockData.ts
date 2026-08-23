@@ -29,22 +29,22 @@ export const mockProfile: ProfileData = {
 };
 
 export const mockAlliancePlayers: AlliancePlayer[] = [
-  { nick: 'Ironclad', level: 30, group: 'R5', totalPowerM: 41.2, playstyle: 'Смешанный' },
-  { nick: 'Valkyrie', level: 29, group: 'R5', totalPowerM: 38.7, playstyle: 'Оборона' },
-  { nick: 'Nyxara', level: 28, group: 'R4', totalPowerM: 33.1, playstyle: 'Смешанный' },
-  { nick: 'Grishka', level: 28, group: 'R4', totalPowerM: 30.4, playstyle: 'Оборона' },
-  { nick: 'Silence', level: 27, group: 'R4', totalPowerM: 27.9, playstyle: 'Фарм' },
-  { nick: 'Atobar', level: 25, group: 'R3', totalPowerM: 20.93, playstyle: 'Фарм', isSelf: true },
-  { nick: 'Dolvax', level: 26, group: 'R3', totalPowerM: 24.6, playstyle: 'Смешанный' },
-  { nick: 'Mirelle', level: 24, group: 'R3', totalPowerM: 19.8, playstyle: 'Фарм' },
-  { nick: 'Bramblewick', level: 23, group: 'R3', totalPowerM: 18.5, playstyle: 'Оборона' },
-  { nick: 'Kestrel', level: 22, group: 'R2', totalPowerM: 14.2, playstyle: 'Фарм' },
-  { nick: 'Ossian', level: 21, group: 'R2', totalPowerM: 12.7, playstyle: 'Смешанный' },
-  { nick: 'Tavren', level: 20, group: 'R2', totalPowerM: 11.3, playstyle: 'Фарм' },
-  { nick: 'Wrenna', level: 19, group: 'R1', totalPowerM: 7.9, playstyle: 'Фарм' },
-  { nick: 'Cobble', level: 18, group: 'R1', totalPowerM: 6.4, playstyle: 'Оборона' },
-  { nick: 'Sorrel', level: 17, group: 'R1', totalPowerM: 5.1, playstyle: 'Фарм' },
-  { nick: 'Pipkin', level: 16, group: 'R1', totalPowerM: 4.3, playstyle: 'Смешанный' },
+  { id: 'p1', nick: 'Ironclad', level: 30, group: 'R5', totalPowerM: 41.2, playstyle: 'Смешанный' },
+  { id: 'p2', nick: 'Valkyrie', level: 29, group: 'R5', totalPowerM: 38.7, playstyle: 'Оборона' },
+  { id: 'p3', nick: 'Nyxara', level: 28, group: 'R4', totalPowerM: 33.1, playstyle: 'Смешанный' },
+  { id: 'p4', nick: 'Grishka', level: 28, group: 'R4', totalPowerM: 30.4, playstyle: 'Оборона' },
+  { id: 'p5', nick: 'Silence', level: 27, group: 'R4', totalPowerM: 27.9, playstyle: 'Фарм' },
+  { id: 'p6', nick: 'Atobar', level: 25, group: 'R3', totalPowerM: 20.93, playstyle: 'Фарм', isSelf: true },
+  { id: 'p7', nick: 'Dolvax', level: 26, group: 'R3', totalPowerM: 24.6, playstyle: 'Смешанный' },
+  { id: 'p8', nick: 'Mirelle', level: 24, group: 'R3', totalPowerM: 19.8, playstyle: 'Фарм' },
+  { id: 'p9', nick: 'Bramblewick', level: 23, group: 'R3', totalPowerM: 18.5, playstyle: 'Оборона' },
+  { id: 'p10', nick: 'Kestrel', level: 22, group: 'R2', totalPowerM: 14.2, playstyle: 'Фарм' },
+  { id: 'p11', nick: 'Ossian', level: 21, group: 'R2', totalPowerM: 12.7, playstyle: 'Смешанный' },
+  { id: 'p12', nick: 'Tavren', level: 20, group: 'R2', totalPowerM: 11.3, playstyle: 'Фарм' },
+  { id: 'p13', nick: 'Wrenna', level: 19, group: 'R1', totalPowerM: 7.9, playstyle: 'Фарм' },
+  { id: 'p14', nick: 'Cobble', level: 18, group: 'R1', totalPowerM: 6.4, playstyle: 'Оборона' },
+  { id: 'p15', nick: 'Sorrel', level: 17, group: 'R1', totalPowerM: 5.1, playstyle: 'Фарм' },
+  { id: 'p16', nick: 'Pipkin', level: 16, group: 'R1', totalPowerM: 4.3, playstyle: 'Смешанный' },
 ];
 
 export const mockCaravan: CaravanEntry[] = [

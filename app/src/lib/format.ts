@@ -1,5 +1,5 @@
 export function formatPowerM(powerM: number): string {
-  return `${powerM.toFixed(2).replace(/0+$/, '').replace(/\.$/, '')}М`;
+  return `${powerM.toFixed(2)}М`;
 }
 
 export function sumPowerM(values: number[]): number {

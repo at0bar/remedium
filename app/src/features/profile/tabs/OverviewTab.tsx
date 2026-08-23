@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '../../../components/ui/Badge';
+import { EditIcon, TrashIcon } from '../../../components/ui/ActionIcons';
 import { Button } from '../../../components/ui/Button';
 import { Callout } from '../../../components/ui/Callout';
 import { StatTile } from '../../../components/ui/StatTile';
@@ -70,11 +71,25 @@ export function OverviewTab() {
             headerBadge={
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <Badge variant="gold">{formatPowerM(squad.powerM)}</Badge>
-                <Button variant="neutral" size="sm" onClick={() => setEditingId(squad.id)}>
-                  Редактировать
+                <Button
+                  variant="neutral"
+                  size="sm"
+                  iconOnly
+                  aria-label="Редактировать"
+                  title="Редактировать"
+                  onClick={() => setEditingId(squad.id)}
+                >
+                  <EditIcon />
                 </Button>
-                <Button variant="red" size="sm" onClick={() => deleteSquad.mutate(squad.id)}>
-                  Удалить
+                <Button
+                  variant="red"
+                  size="sm"
+                  iconOnly
+                  aria-label="Удалить"
+                  title="Удалить"
+                  onClick={() => deleteSquad.mutate(squad.id)}
+                >
+                  <TrashIcon />
                 </Button>
               </div>
             }

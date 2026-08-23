@@ -18,7 +18,7 @@ export function ElixirRaceTab() {
 
   return (
     <TableWrap>
-      <table>
+      <table className="tbl-nowrap">
         <thead>
           <tr>
             <th>Ник</th>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { SaveIcon } from '../../../components/ui/ActionIcons';
 import { Button } from '../../../components/ui/Button';
 import { Callout } from '../../../components/ui/Callout';
 import { Card, CardTitle } from '../../../components/ui/Card';
@@ -39,10 +40,13 @@ export function SettingsTab() {
             />
             <Button
               variant="gold"
+              iconOnly
+              aria-label="Сохранить"
+              title="Сохранить"
               disabled={!nickChanged || updateNick.isPending}
               onClick={() => nickChanged && updateNick.mutate(nick.trim())}
             >
-              Сохранить
+              <SaveIcon />
             </Button>
           </div>
         </div>
@@ -65,6 +69,9 @@ export function SettingsTab() {
             />
             <Button
               variant="gold"
+              iconOnly
+              aria-label="Сохранить"
+              title="Сохранить"
               disabled={!password}
               onClick={() => {
                 setPassword(password);
@@ -72,7 +79,7 @@ export function SettingsTab() {
                 setPasswordSaved(true);
               }}
             >
-              Сохранить
+              <SaveIcon />
             </Button>
           </div>
           {passwordSaved && (

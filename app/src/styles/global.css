@@ -676,6 +676,9 @@ body::before {
   padding: 4px 9px;
   font-size: 11px;
 }
+.btn-icon {
+  padding: 6px;
+}
 .btn-gold {
   background: var(--gold-dim);
   border-color: rgba(201, 168, 76, 0.35);
@@ -723,11 +726,34 @@ body::before {
 /* TABLE */
 .tw {
   overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  margin-bottom: 4px;
 }
 table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
+}
+/* Fixed column widths (set via <colgroup>) so editable rows never resize a column
+   relative to its own read-only rows — inputs/selects fill their column instead.
+   min-width keeps it from being squeezed unreadably on narrow viewports — .tw's
+   overflow-x: auto then lets it scroll sideways instead of wrapping/clipping. */
+.tbl-fixed {
+  table-layout: fixed;
+  min-width: 760px;
+}
+/* Opt-in for plain (non-fixed) data tables: cells never wrap, so on a narrow
+   viewport the table keeps its natural width and scrolls inside .tw instead of
+   squeezing every column illegibly thin. */
+.tbl-nowrap {
+  width: auto;
+  min-width: 100%;
+}
+.tbl-nowrap th,
+.tbl-nowrap td {
+  white-space: nowrap;
 }
 thead th {
   font-family: var(--mono);
@@ -761,6 +787,15 @@ tbody tr.self {
 tbody tr.self:hover {
   background: rgba(201, 168, 76, 0.18);
 }
+.tbl-actions {
+  white-space: nowrap;
+  text-align: right;
+}
+.tbl-cell-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 tbody tr:last-child {
   border-bottom: none;
 }
@@ -775,11 +810,7 @@ tbody td:first-child {
   color: var(--text2);
 }
 .tc {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: var(--panel);
-  margin-bottom: 4px;
+  min-width: 100%;
 }
 .tc td:nth-child(3) {
   white-space: nowrap;

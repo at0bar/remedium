@@ -6,14 +6,15 @@ export type ButtonSize = 'sm' | 'md';
 export function Button({
   variant = 'neutral',
   size = 'md',
+  iconOnly = false,
   className = '',
   type = 'button',
   ...rest
-}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: ButtonVariant; size?: ButtonSize }) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: ButtonVariant; size?: ButtonSize; iconOnly?: boolean }) {
   return (
     <button
       type={type}
-      className={`btn btn-${variant}${size === 'sm' ? ' btn-sm' : ''}${className ? ` ${className}` : ''}`}
+      className={`btn btn-${variant}${size === 'sm' ? ' btn-sm' : ''}${iconOnly ? ' btn-icon' : ''}${className ? ` ${className}` : ''}`}
       {...rest}
     />
   );

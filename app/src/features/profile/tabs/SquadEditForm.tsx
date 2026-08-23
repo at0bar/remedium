@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { CancelIcon, SaveIcon } from '../../../components/ui/ActionIcons';
 import { Button } from '../../../components/ui/Button';
 import { allHeroNames } from '../../guide/data/heroes';
 import type { Squad } from '../../../lib/api/types';
@@ -26,11 +27,18 @@ export function SquadEditForm({
       <div className="squad-hdr">
         <div className="squad-title">{initial?.name ?? 'Новый отряд'}</div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <Button variant="gold" size="sm" onClick={() => onSave({ powerM, heroes })}>
-            Сохранить
+          <Button
+            variant="gold"
+            size="sm"
+            iconOnly
+            aria-label="Сохранить"
+            title="Сохранить"
+            onClick={() => onSave({ powerM, heroes })}
+          >
+            <SaveIcon />
           </Button>
-          <Button variant="neutral" size="sm" onClick={onCancel}>
-            Отмена
+          <Button variant="neutral" size="sm" iconOnly aria-label="Отмена" title="Отмена" onClick={onCancel}>
+            <CancelIcon />
           </Button>
         </div>
       </div>

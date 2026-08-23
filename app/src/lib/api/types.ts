@@ -5,6 +5,8 @@ export interface Squad {
   name: string;
   /** Squad power in millions, e.g. 9.35 = 9.35M */
   powerM: number;
+  /** 5 hero names, front-to-back. Mocked for now — not yet backed by real hero/loadout data. */
+  heroes: string[];
 }
 
 export interface ProfileStats {

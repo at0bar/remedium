@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
+import { Badge } from '../../../components/ui/Badge';
 import { Callout } from '../../../components/ui/Callout';
-import { Card, CardTitle } from '../../../components/ui/Card';
 import { StatTile } from '../../../components/ui/StatTile';
+import { SquadBlock } from '../../../components/ui/SquadBlock';
 import { useProfile } from '../../../lib/api/hooks';
 import { formatDate, formatPercentChange, formatPowerM, sumPowerM } from '../../../lib/format';
 
@@ -44,16 +45,14 @@ export function OverviewTab() {
       </div>
 
       <div className="blabel">Отряды ({profile.squads.length}/4) · суммарная мощь {formatPowerM(totalPower)}</div>
-      <div className="g-auto">
-        {profile.squads.map((squad) => (
-          <Card accent="gold" key={squad.name}>
-            <CardTitle>{squad.name}</CardTitle>
-            <p>
-              Мощь: <strong style={{ color: '#fff' }}>{formatPowerM(squad.powerM)}</strong>
-            </p>
-          </Card>
-        ))}
-      </div>
+      {profile.squads.map((squad) => (
+        <SquadBlock
+          key={squad.name}
+          title={squad.name}
+          headerBadge={<Badge variant="gold">{formatPowerM(squad.powerM)}</Badge>}
+          slots={squad.heroes.map((name, i) => ({ role: `Герой ${i + 1}`, name }))}
+        />
+      ))}
 
       <div className="blabel">Краткая статистика</div>
       <div className="g-auto">

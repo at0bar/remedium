@@ -15,9 +15,9 @@ export const mockProfile: ProfileData = {
   playstyle: 'Фарм',
   coords: { x: 680, y: 428 },
   squads: [
-    { name: 'Отряд 1', powerM: 9.35 },
-    { name: 'Отряд 2', powerM: 6.38 },
-    { name: 'Отряд 3', powerM: 5.2 },
+    { name: 'Отряд 1', powerM: 9.35, heroes: ['Arthur', 'Daskal', 'Marlena', 'Zoya', 'Harper'] },
+    { name: 'Отряд 2', powerM: 6.38, heroes: ['Shadow', 'Louis', 'Red Lady', 'Cynthia', 'Bell'] },
+    { name: 'Отряд 3', powerM: 5.2, heroes: ['Brian', 'Bella', 'Jester', 'Claire', 'Celia'] },
   ],
   stats: {
     avgDuelScore: 18420,

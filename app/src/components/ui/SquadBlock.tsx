@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 export interface HeroSlot {
   role: string;
   name: string;
-  type: string;
+  type?: string;
 }
 
 export function SquadBlock({
@@ -28,7 +28,7 @@ export function SquadBlock({
           <div className="hslot" key={i}>
             <div className="hslot-r">{slot.role}</div>
             <div className="hslot-n">{slot.name}</div>
-            <div className="hslot-t">{slot.type}</div>
+            {slot.type && <div className="hslot-t">{slot.type}</div>}
           </div>
         ))}
       </div>

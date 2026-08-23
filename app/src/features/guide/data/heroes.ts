@@ -266,3 +266,8 @@ export const srHeroes: SrHero[] = [
     notes: 'Только для заполнения слота. Не вкладываться сверх этого.',
   },
 ];
+
+/** Flattened, sorted hero-name roster for pickers (squad composition, etc.) across all rarities. */
+export const allHeroNames: string[] = [...urHeroes, ...ssrHeroes, ...srHeroes]
+  .map((h) => h.name)
+  .sort((a, b) => a.localeCompare(b));

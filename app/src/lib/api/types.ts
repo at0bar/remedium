@@ -2,10 +2,11 @@ export type PlayerGroup = 'R1' | 'R2' | 'R3' | 'R4' | 'R5';
 export type Playstyle = 'Фарм' | 'Оборона' | 'Смешанный';
 
 export interface Squad {
+  id: string;
   name: string;
   /** Squad power in millions, e.g. 9.35 = 9.35M */
   powerM: number;
-  /** 5 hero names, front-to-back. Mocked for now — not yet backed by real hero/loadout data. */
+  /** 5 hero names, front-to-back; '' marks an empty slot. Mocked for now — not yet backed by real hero/loadout data. */
   heroes: string[];
 }
 

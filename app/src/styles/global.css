@@ -651,6 +651,75 @@ body::before {
   color: var(--text2);
 }
 
+/* BUTTON (compact inline action — dim-fill formula, non-full-width sibling of .auth-btn) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--radius);
+  padding: 8px 14px;
+  font-family: var(--display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: none;
+  white-space: nowrap;
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.btn-sm {
+  padding: 4px 9px;
+  font-size: 11px;
+}
+.btn-gold {
+  background: var(--gold-dim);
+  border-color: rgba(201, 168, 76, 0.35);
+  color: var(--gold-lt);
+}
+.btn-gold:hover:not(:disabled) {
+  background: rgba(201, 168, 76, 0.2);
+}
+.btn-neutral {
+  background: var(--ink3);
+  border-color: var(--border2);
+  color: var(--text2);
+}
+.btn-neutral:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--panel);
+}
+.btn-red {
+  background: var(--red-dim);
+  border-color: rgba(224, 82, 82, 0.3);
+  color: var(--red);
+}
+.btn-red:hover:not(:disabled) {
+  background: rgba(224, 82, 82, 0.16);
+}
+
+/* SQUAD EDIT FORM */
+.squad-body-edit {
+  padding: 14px 14px 4px;
+}
+.hero-slots-edit {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+.hero-slots-edit .auth-field {
+  margin-bottom: 14px;
+}
+@media (max-width: 600px) {
+  .hero-slots-edit {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 /* TABLE */
 .tw {
   overflow-x: auto;

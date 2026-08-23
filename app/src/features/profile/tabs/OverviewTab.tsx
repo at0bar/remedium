@@ -1,19 +1,27 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '../../../components/ui/Badge';
+import { Button } from '../../../components/ui/Button';
 import { Callout } from '../../../components/ui/Callout';
 import { StatTile } from '../../../components/ui/StatTile';
 import { SquadBlock } from '../../../components/ui/SquadBlock';
-import { useProfile } from '../../../lib/api/hooks';
+import { useAddSquad, useDeleteSquad, useProfile, useUpdateSquad } from '../../../lib/api/hooks';
 import { formatDate, formatPercentChange, formatPowerM, sumPowerM } from '../../../lib/format';
+import { SquadEditForm } from './SquadEditForm';
 
 export function OverviewTab() {
   const { data: profile, isLoading } = useProfile();
+  const addSquad = useAddSquad();
+  const updateSquad = useUpdateSquad();
+  const deleteSquad = useDeleteSquad();
+  const [editingId, setEditingId] = useState<string | 'new' | null>(null);
 
   if (isLoading || !profile) {
     return <p style={{ color: 'var(--text2)', fontSize: 13 }}>Загрузка профиля…</p>;
   }
 
   const totalPower = sumPowerM(profile.squads.map((s) => s.powerM));
+  const canAddSquad = profile.squads.length < 4;
 
   return (
     <>
@@ -45,14 +53,50 @@ export function OverviewTab() {
       </div>
 
       <div className="blabel">Отряды ({profile.squads.length}/4) · суммарная мощь {formatPowerM(totalPower)}</div>
-      {profile.squads.map((squad) => (
-        <SquadBlock
-          key={squad.name}
-          title={squad.name}
-          headerBadge={<Badge variant="gold">{formatPowerM(squad.powerM)}</Badge>}
-          slots={squad.heroes.map((name, i) => ({ role: `Герой ${i + 1}`, name }))}
+      {profile.squads.map((squad) =>
+        editingId === squad.id ? (
+          <SquadEditForm
+            key={squad.id}
+            initial={squad}
+            onSave={(data) => {
+              updateSquad.mutate({ ...squad, ...data }, { onSuccess: () => setEditingId(null) });
+            }}
+            onCancel={() => setEditingId(null)}
+          />
+        ) : (
+          <SquadBlock
+            key={squad.id}
+            title={squad.name}
+            headerBadge={
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <Badge variant="gold">{formatPowerM(squad.powerM)}</Badge>
+                <Button variant="neutral" size="sm" onClick={() => setEditingId(squad.id)}>
+                  Редактировать
+                </Button>
+                <Button variant="red" size="sm" onClick={() => deleteSquad.mutate(squad.id)}>
+                  Удалить
+                </Button>
+              </div>
+            }
+            slots={squad.heroes.map((name, i) => ({ role: `Герой ${i + 1}`, name: name || '—' }))}
+          />
+        ),
+      )}
+
+      {editingId === 'new' && (
+        <SquadEditForm
+          initial={null}
+          onSave={(data) => {
+            addSquad.mutate(data, { onSuccess: () => setEditingId(null) });
+          }}
+          onCancel={() => setEditingId(null)}
         />
-      ))}
+      )}
+      {canAddSquad && editingId !== 'new' && (
+        <Button variant="gold" onClick={() => setEditingId('new')}>
+          + Добавить отряд
+        </Button>
+      )}
 
       <div className="blabel">Краткая статистика</div>
       <div className="g-auto">

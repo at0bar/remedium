@@ -1,5 +1,6 @@
 export * from './Card';
 export * from './Badge';
+export * from './Button';
 export * from './Callout';
 export * from './PriorityList';
 export * from './TierBlock';

@@ -25,7 +25,7 @@ export function RatingTab() {
         </thead>
         <tbody>
           {sortedByLatest.map((entry) => (
-            <tr key={entry.nick}>
+            <tr key={entry.nick} className={entry.isSelf ? 'self' : undefined}>
               <td>
                 <strong style={{ color: '#fff' }}>{entry.nick}</strong>
               </td>

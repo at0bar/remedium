@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { readLocalStore, writeLocalStore } from '../../lib/api/localStore';
 
 export type SiteRole = 'member' | 'officer';
 
@@ -11,21 +12,26 @@ interface AuthContextValue {
   user: AuthUser | null;
   login: (nick: string, password: string) => Promise<boolean>;
   logout: () => void;
+  setPassword: (password: string) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 const STORAGE_KEY = 'remedium.mock-auth-user';
+const PASSWORD_KEY = 'auth:password';
 
 /**
  * MOCK auth — placeholder for the future backend-issued JWT/cookie session.
- * Accepts any non-empty nick/password; nicks "admin" or "officer" get the
+ * Accepts any non-empty nick/password until a password is set via Settings,
+ * after which login checks against it; nicks "admin" or "officer" get the
  * officer role (used to gate future edit-only UI), everything else is a
  * read-only member. Replace with a real API call once the backend exists.
  */
 function mockAuthenticate(nick: string, password: string): AuthUser | null {
   const trimmed = nick.trim();
   if (!trimmed || !password) return null;
+  const savedPassword = readLocalStore<string | null>(PASSWORD_KEY, null);
+  if (savedPassword !== null && password !== savedPassword) return null;
   const role: SiteRole = ['admin', 'officer'].includes(trimmed.toLowerCase()) ? 'officer' : 'member';
   return { nick: trimmed, role };
 }
@@ -52,7 +58,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }
 
-  return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;
+  function setPassword(password: string) {
+    writeLocalStore(PASSWORD_KEY, password);
+  }
+
+  return <AuthContext.Provider value={{ user, login, logout, setPassword }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

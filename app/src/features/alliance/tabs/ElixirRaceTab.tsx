@@ -29,7 +29,7 @@ export function ElixirRaceTab() {
         </thead>
         <tbody>
           {entries?.map((entry) => (
-            <tr key={entry.nick}>
+            <tr key={entry.nick} className={entry.isSelf ? 'self' : undefined}>
               <td>
                 <strong style={{ color: '#fff' }}>{entry.nick}</strong>
               </td>

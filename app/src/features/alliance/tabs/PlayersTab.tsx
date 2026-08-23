@@ -73,7 +73,7 @@ export function PlayersTab() {
           </thead>
           <tbody>
             {sorted.map((player) => (
-              <tr key={player.nick}>
+              <tr key={player.nick} className={player.isSelf ? 'self' : undefined}>
                 <td>
                   <strong style={{ color: '#fff' }}>{player.nick}</strong>
                 </td>

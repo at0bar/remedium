@@ -755,6 +755,12 @@ tbody tr {
 tbody tr:hover {
   background: rgba(255, 255, 255, 0.02);
 }
+tbody tr.self {
+  background: var(--gold-dim);
+}
+tbody tr.self:hover {
+  background: rgba(201, 168, 76, 0.18);
+}
 tbody tr:last-child {
   border-bottom: none;
 }

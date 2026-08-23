@@ -35,6 +35,7 @@ export interface AlliancePlayer {
   group: PlayerGroup;
   totalPowerM: number;
   playstyle: Playstyle;
+  isSelf?: boolean;
 }
 
 export type CaravanFlag = 'страж' | 'vip';
@@ -45,6 +46,7 @@ export interface CaravanEntry {
   level: number;
   flag: CaravanFlag;
   lastAssignedDate: string;
+  isSelf?: boolean;
 }
 
 export type FormationRole = 'attacker' | 'mixed' | 'defender' | 'none';
@@ -67,12 +69,14 @@ export interface ElixirRaceEntry {
   level: number;
   team: ElixirTeam;
   participation: ElixirParticipation;
+  isSelf?: boolean;
 }
 
 export interface WeeklyRatingEntry {
   nick: string;
   /** Points for the last 5 weeks, newest first — length matches ratingWeeks. */
   points: number[];
+  isSelf?: boolean;
 }
 
 export interface ContributionEntry {

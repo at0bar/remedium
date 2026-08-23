@@ -18,9 +18,13 @@ export function LoginPage() {
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setError(null);
+    if (!nick.trim() || !password) {
+      setError('Введите ник и пароль.');
+      return;
+    }
     const ok = await login(nick, password);
     if (!ok) {
-      setError('Введите ник и пароль.');
+      setError('Неверный пароль.');
       return;
     }
     navigate('/profile', { replace: true });

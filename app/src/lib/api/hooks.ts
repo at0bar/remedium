@@ -21,6 +21,7 @@ import type { ProfileData, Squad } from './types';
  */
 
 const SQUADS_KEY = 'profile:squads';
+const NICK_KEY = 'profile:nick';
 
 function loadSquads(): Squad[] {
   return readLocalStore(SQUADS_KEY, mockProfile.squads);
@@ -35,8 +36,35 @@ function nextSquadName(squads: Squad[]) {
   return `Отряд ${next}`;
 }
 
+function currentNick(): string {
+  return readLocalStore(NICK_KEY, mockProfile.nick);
+}
+
+/** Substitutes the live nick into whichever row is flagged `isSelf` — the one place every roster/leaderboard mock agrees on "who you are". */
+function withCurrentNick<T extends { nick: string; isSelf?: boolean }>(rows: T[]): T[] {
+  const nick = currentNick();
+  return rows.map((row) => (row.isSelf ? { ...row, nick } : row));
+}
+
 export function useProfile() {
-  return useQuery({ queryKey: ['profile'], queryFn: () => mockFetch({ ...mockProfile, squads: loadSquads() }) });
+  return useQuery({
+    queryKey: ['profile'],
+    queryFn: () => mockFetch({ ...mockProfile, nick: currentNick(), squads: loadSquads() }),
+  });
+}
+
+export function useUpdateNick() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (nick: string) => {
+      writeLocalStore(NICK_KEY, nick);
+      return mockFetch(nick);
+    },
+    onSuccess: () => {
+      // The nick can appear as an `isSelf` row in any roster/leaderboard query — refresh them all.
+      queryClient.invalidateQueries();
+    },
+  });
 }
 
 function useSquadsMutation<TVariables>(mutate: (squads: Squad[], variables: TVariables) => Squad[]) {
@@ -65,28 +93,28 @@ export function useDeleteSquad() {
 }
 
 export function useAlliancePlayers() {
-  return useQuery({ queryKey: ['alliance', 'players'], queryFn: () => mockFetch(mockAlliancePlayers) });
+  return useQuery({ queryKey: ['alliance', 'players'], queryFn: () => mockFetch(withCurrentNick(mockAlliancePlayers)) });
 }
 
 export function useCaravan() {
-  return useQuery({ queryKey: ['alliance', 'caravan'], queryFn: () => mockFetch(mockCaravan) });
+  return useQuery({ queryKey: ['alliance', 'caravan'], queryFn: () => mockFetch(withCurrentNick(mockCaravan)) });
 }
 
 export function useElixirRace() {
-  return useQuery({ queryKey: ['alliance', 'elixir-race'], queryFn: () => mockFetch(mockElixirRace) });
+  return useQuery({ queryKey: ['alliance', 'elixir-race'], queryFn: () => mockFetch(withCurrentNick(mockElixirRace)) });
 }
 
 export function useFormation() {
-  return useQuery({ queryKey: ['alliance', 'formation'], queryFn: () => mockFetch(mockFormationTiles) });
+  return useQuery({ queryKey: ['alliance', 'formation'], queryFn: () => mockFetch(withCurrentNick(mockFormationTiles)) });
 }
 
 export function useContribution() {
-  return useQuery({ queryKey: ['stats', 'contribution'], queryFn: () => mockFetch(mockContribution) });
+  return useQuery({ queryKey: ['stats', 'contribution'], queryFn: () => mockFetch(withCurrentNick(mockContribution)) });
 }
 
 export function useWeeklyRating() {
   return useQuery({
     queryKey: ['stats', 'weekly-rating'],
-    queryFn: () => mockFetch({ weeks: ratingWeeks, entries: mockWeeklyRating }),
+    queryFn: () => mockFetch({ weeks: ratingWeeks, entries: withCurrentNick(mockWeeklyRating) }),
   });
 }

@@ -1,6 +1,7 @@
 import type {
   AlliancePlayer,
   CaravanEntry,
+  ContributionEntry,
   ElixirRaceEntry,
   FormationTile,
   ProfileData,
@@ -194,4 +195,36 @@ export const mockFormationTiles: FormationTile[] = [
   { x: 700, y: 392, nick: 'Extazy13', power: 13, role: 'attacker' },
   { x: 704, y: 392, nick: 'Nikolaiastr…', power: 12, role: 'attacker' },
   { x: 708, y: 392, nick: 'capitanmorg…', power: 17, role: 'attacker' },
+];
+
+/**
+ * Transcribed from a screenshot of the alliance-duel rating leaderboard.
+ * Group is each player's real alliance rank, independent of the R1/R2/R3
+ * milestone lines shown on the scale — those mark typical group thresholds,
+ * not a computed rule.
+ */
+export const mockContribution: ContributionEntry[] = [
+  { nick: 'Axxxiles', group: 'R4', points: 53_664_201 },
+  { nick: 'DokDree', group: 'R4', points: 51_495_684 },
+  { nick: 'Pavelllll', group: 'R3', points: 49_915_036 },
+  { nick: 'Apyrexia', group: 'R4', points: 48_482_296 },
+  { nick: 'DokDja', group: 'R3', points: 42_388_968 },
+  { nick: 'Yari4ik', group: 'R3', points: 39_317_533 },
+  { nick: 'vanillavy', group: 'R3', points: 37_333_669 },
+  { nick: 'gans92', group: 'R3', points: 36_352_069 },
+  { nick: 'Alishechka', group: 'R3', points: 35_985_404 },
+  { nick: 'Алц', group: 'R3', points: 35_443_305 },
+  { nick: 'Dr-Cheshire', group: 'R3', points: 33_235_914 },
+  { nick: 'NehirT', group: 'R2', points: 32_262_105 },
+  { nick: 'capitanmorgan', group: 'R3', points: 31_434_509 },
+  { nick: 'marena', group: 'R2', points: 30_914_372 },
+  { nick: 'RAGNAR-Иваныч', group: 'R2', points: 29_785_175 },
+  { nick: 'Бландос', group: 'R2', points: 23_560_299 },
+  { nick: '-ТриАда-', group: 'R2', points: 23_510_643 },
+  { nick: 'Atobar', group: 'R3', points: 22_252_151, isSelf: true },
+  { nick: 'РафНаБананвом', group: 'R2', points: 21_966_068 },
+  { nick: 'vladisskk', group: 'R2', points: 20_754_235 },
+  { nick: 'NadiNka', group: 'R2', points: 20_376_827 },
+  { nick: '0plague0beast0', group: 'R1', points: 19_440_844 },
+  { nick: 'AmozFFm', group: 'R1', points: 18_231_690 },
 ];

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   mockAlliancePlayers,
   mockCaravan,
+  mockContribution,
   mockElixirRace,
   mockFormationTiles,
   mockProfile,
@@ -33,6 +34,10 @@ export function useElixirRace() {
 
 export function useFormation() {
   return useQuery({ queryKey: ['alliance', 'formation'], queryFn: () => mockFetch(mockFormationTiles) });
+}
+
+export function useContribution() {
+  return useQuery({ queryKey: ['stats', 'contribution'], queryFn: () => mockFetch(mockContribution) });
 }
 
 export function useWeeklyRating() {

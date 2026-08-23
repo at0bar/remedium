@@ -1139,6 +1139,95 @@ tbody td:first-child {
   color: var(--gold-lt);
 }
 
+/* CONTRIBUTION SCALE (Статистика → Анализ вклада) */
+.contrib-plot {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.contrib-ruler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 2;
+}
+.contrib-ruler-line {
+  stroke: var(--text3);
+  stroke-width: 1.5;
+}
+.contrib-ruler-tick {
+  stroke: var(--text3);
+  stroke-width: 1;
+}
+.contrib-ruler-label {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 10px;
+  fill: var(--text3);
+}
+.contrib-tick-dot {
+  fill: var(--gold);
+}
+.contrib-leader {
+  stroke: var(--border2);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+}
+.contrib-milestone {
+  position: absolute;
+  height: 1.5px;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+.contrib-milestone-label {
+  position: absolute;
+  transform: translateY(-50%);
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: right;
+  z-index: 3;
+}
+.contrib-row {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translateY(-50%);
+  z-index: 3;
+}
+.contrib-row.self {
+  background: var(--gold-dim);
+  border-radius: 3px;
+  padding: 2px 6px;
+  margin-left: -6px;
+}
+.contrib-row-nick {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: #fff;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.contrib-row-points {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--text2);
+  flex-shrink: 0;
+}
+.contrib-row .badge {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 /* AUTH */
 .auth-shell {
   min-height: 100vh;

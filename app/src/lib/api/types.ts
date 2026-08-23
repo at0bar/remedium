@@ -71,3 +71,11 @@ export interface WeeklyRatingEntry {
   /** Points for the last 5 weeks, newest first — length matches ratingWeeks. */
   points: number[];
 }
+
+export interface ContributionEntry {
+  nick: string;
+  group: PlayerGroup;
+  /** Total alliance-duel rating points contributed. */
+  points: number;
+  isSelf?: boolean;
+}

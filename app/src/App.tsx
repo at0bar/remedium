@@ -7,6 +7,7 @@ import { RequireAuth } from './features/auth/RequireAuth';
 import { AlliancePage } from './features/alliance/AlliancePage';
 import { GuidePage } from './features/guide/GuidePage';
 import { ProfilePage } from './features/profile/ProfilePage';
+import { ServerPage } from './features/server/ServerPage';
 import { StatisticsPage } from './features/statistics/StatisticsPage';
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ function App() {
               <Route index element={<Navigate to="/profile" replace />} />
               <Route path="profile/*" element={<ProfilePage />} />
               <Route path="guide/*" element={<GuidePage />} />
+              <Route path="server/*" element={<ServerPage />} />
               <Route path="alliance/*" element={<AlliancePage />} />
               <Route path="stats/*" element={<StatisticsPage />} />
               <Route path="*" element={<Navigate to="/profile" replace />} />

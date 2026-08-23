@@ -18,7 +18,7 @@ const TABS = [
 export function AlliancePage() {
   return (
     <section className="section">
-      <SectionHeader num="03 // АЛЬЯНС" title="[Meow] Akatsukii" sub="Состав альянса, события и распределение ролей" />
+      <SectionHeader num="04 // АЛЬЯНС" title="[Meow] Akatsukii" sub="Состав альянса, события и распределение ролей" />
       <TabBar tabs={TABS} />
       <Routes>
         <Route index element={<Navigate to="players" replace />} />

@@ -42,3 +42,13 @@ export function StatisticsIcon() {
     </svg>
   );
 }
+
+export function ServerIcon() {
+  return (
+    <svg {...common}>
+      <rect x="4" y="4" width="16" height="6" rx="1.5" />
+      <rect x="4" y="14" width="16" height="6" rx="1.5" />
+      <path d="M8 7h.01M8 17h.01" />
+    </svg>
+  );
+}

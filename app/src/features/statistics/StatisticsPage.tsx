@@ -12,7 +12,7 @@ const TABS = [
 export function StatisticsPage() {
   return (
     <section className="section">
-      <SectionHeader num="04 // СТАТИСТИКА" title="Статистика" sub="Недельная динамика и вклад участников альянса" />
+      <SectionHeader num="05 // СТАТИСТИКА" title="Статистика" sub="Недельная динамика и вклад участников альянса" />
       <TabBar tabs={TABS} />
       <Routes>
         <Route index element={<Navigate to="contribution" replace />} />

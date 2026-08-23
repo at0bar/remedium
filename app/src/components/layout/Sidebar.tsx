@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../features/auth/AuthContext';
-import { AllianceIcon, GuideIcon, ProfileIcon, StatisticsIcon } from './NavIcons';
+import { AllianceIcon, GuideIcon, ProfileIcon, ServerIcon, StatisticsIcon } from './NavIcons';
 
 const NAV_ITEMS: { to: string; icon: ReactNode; label: string }[] = [
   { to: '/profile', icon: <ProfileIcon />, label: 'Профиль' },
   { to: '/guide', icon: <GuideIcon />, label: 'Гайд' },
+  { to: '/server', icon: <ServerIcon />, label: 'Сервер' },
   { to: '/alliance', icon: <AllianceIcon />, label: 'Альянс' },
   { to: '/stats', icon: <StatisticsIcon />, label: 'Статистика' },
 ];

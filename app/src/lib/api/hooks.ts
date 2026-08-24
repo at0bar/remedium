@@ -11,7 +11,7 @@ import {
   ratingWeeks,
 } from './mockData';
 import { mockFetch } from './mockFetch';
-import type { AlliancePlayer, ProfileData, Squad } from './types';
+import type { AlliancePlayer, CaravanDraw, CaravanRun, ProfileData, Squad } from './types';
 import { sumPowerM } from '../format';
 
 /**
@@ -25,6 +25,11 @@ const SQUADS_KEY = 'profile:squads';
 const NICK_KEY = 'profile:nick';
 const PLAYERS_KEY = 'alliance:players';
 const PLAYERS_QUERY_KEY = ['alliance', 'players'] as const;
+// Renamed from 'alliance:caravan' when the shape changed to runs (coachman+escort) — old
+// browsers may still hold the flat per-player shape under that key, which would crash the
+// new code on read, so this points at a fresh key instead of trying to migrate it in place.
+const CARAVAN_KEY = 'alliance:caravan-runs';
+const CARAVAN_QUERY_KEY = ['alliance', 'caravan'] as const;
 
 function loadSquads(): Squad[] {
   return readLocalStore(SQUADS_KEY, mockProfile.squads);
@@ -188,8 +193,86 @@ export function useDeletePlayer() {
   );
 }
 
+function loadCaravan(): CaravanRun[] {
+  return readLocalStore(CARAVAN_KEY, mockCaravan);
+}
+
+/** Same idea as `withCurrentNick`, but a run's `isSelf` player can be its coachman or its escort. */
+function withCurrentNickInRuns(runs: CaravanRun[]): CaravanRun[] {
+  const nick = currentNick();
+  return runs.map((run) => ({
+    ...run,
+    coachman: run.coachman.isSelf ? { ...run.coachman, nick } : run.coachman,
+    escort: run.escort.isSelf ? { ...run.escort, nick } : run.escort,
+  }));
+}
+
+function pickRandom<T>(list: T[], count: number): T[] {
+  const pool = [...list];
+  const result: T[] = [];
+  while (result.length < count && pool.length) {
+    const idx = Math.floor(Math.random() * pool.length);
+    result.push(pool.splice(idx, 1)[0]);
+  }
+  return result;
+}
+
+/**
+ * Who gets drawn — and, once the real rule for it exists, which of 'страж'/'vip' the escort
+ * gets — has to be decided server-side (a client can't be trusted to roll fairly against its
+ * own favor). This function is the whole thing to delete once a real POST /caravan/roll exists;
+ * call sites only ever see `useRollCaravan()`'s mutate/data, so nothing else changes.
+ */
+function drawCaravanPair(players: AlliancePlayer[], runs: CaravanRun[]): CaravanDraw | null {
+  const usedNicks = new Set(runs.flatMap((r) => [r.coachman.nick, r.escort.nick]));
+  let eligible = players.filter((p) => !usedNicks.has(p.nick));
+  // Everyone has already had a turn — the exclusion cycle restarts from the full roster.
+  if (eligible.length < 2) eligible = players;
+  if (eligible.length < 2) return null;
+
+  const [coachman, escort] = pickRandom(eligible, 2);
+  const escortRole: CaravanDraw['escortRole'] = Math.random() < 0.5 ? 'страж' : 'vip';
+  return {
+    coachman: { nick: coachman.nick, group: coachman.group, level: coachman.level },
+    escort: { nick: escort.nick, group: escort.group, level: escort.level },
+    escortRole,
+  };
+}
+
 export function useCaravan() {
-  return useQuery({ queryKey: ['alliance', 'caravan'], queryFn: () => mockFetch(withCurrentNick(mockCaravan)) });
+  return useQuery({
+    queryKey: CARAVAN_QUERY_KEY,
+    queryFn: () => mockFetch(withCurrentNickInRuns(loadCaravan())),
+  });
+}
+
+export function useRollCaravan() {
+  return useMutation({
+    mutationFn: () => mockFetch(drawCaravanPair(loadPlayers(), loadCaravan())),
+  });
+}
+
+export function useAddCaravanRun() {
+  return useLocalListMutation<CaravanRun, CaravanDraw>(
+    CARAVAN_QUERY_KEY,
+    CARAVAN_KEY,
+    mockCaravan,
+    (runs, draw) => [
+      ...runs,
+      { ...draw, id: crypto.randomUUID(), lastAssignedDate: new Date().toISOString().slice(0, 10) },
+    ],
+    withCurrentNickInRuns,
+  );
+}
+
+export function useUpdateCaravanRun() {
+  return useLocalListMutation<CaravanRun, CaravanRun>(
+    CARAVAN_QUERY_KEY,
+    CARAVAN_KEY,
+    mockCaravan,
+    (runs, updated) => runs.map((r) => (r.id === updated.id ? updated : r)),
+    withCurrentNickInRuns,
+  );
 }
 
 export function useElixirRace() {

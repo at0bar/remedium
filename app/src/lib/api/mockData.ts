@@ -1,6 +1,6 @@
 import type {
   AlliancePlayer,
-  CaravanEntry,
+  CaravanRun,
   ContributionEntry,
   ElixirRaceEntry,
   FormationTile,
@@ -47,13 +47,28 @@ export const mockAlliancePlayers: AlliancePlayer[] = [
   { id: 'p16', nick: 'Pipkin', level: 16, group: 'R1', totalPowerM: 4.3, playstyle: 'Смешанный' },
 ];
 
-export const mockCaravan: CaravanEntry[] = [
-  { nick: 'Ironclad', group: 'R5', level: 30, flag: 'страж', lastAssignedDate: '2026-07-28' },
-  { nick: 'Valkyrie', group: 'R5', level: 29, flag: 'vip', lastAssignedDate: '2026-07-25' },
-  { nick: 'Nyxara', group: 'R4', level: 28, flag: 'страж', lastAssignedDate: '2026-07-22' },
-  { nick: 'Atobar', group: 'R3', level: 25, flag: 'vip', lastAssignedDate: '2026-07-21', isSelf: true },
-  { nick: 'Dolvax', group: 'R3', level: 26, flag: 'страж', lastAssignedDate: '2026-07-19' },
-  { nick: 'Kestrel', group: 'R2', level: 22, flag: 'vip', lastAssignedDate: '2026-07-14' },
+export const mockCaravan: CaravanRun[] = [
+  {
+    id: 'run1',
+    coachman: { nick: 'Ironclad', group: 'R5', level: 30 },
+    escort: { nick: 'Valkyrie', group: 'R5', level: 29 },
+    escortRole: 'vip',
+    lastAssignedDate: '2026-07-28',
+  },
+  {
+    id: 'run2',
+    coachman: { nick: 'Nyxara', group: 'R4', level: 28 },
+    escort: { nick: 'Atobar', group: 'R3', level: 25, isSelf: true },
+    escortRole: 'vip',
+    lastAssignedDate: '2026-07-21',
+  },
+  {
+    id: 'run3',
+    coachman: { nick: 'Dolvax', group: 'R3', level: 26 },
+    escort: { nick: 'Kestrel', group: 'R2', level: 22 },
+    escortRole: 'страж',
+    lastAssignedDate: '2026-07-14',
+  },
 ];
 
 export const mockElixirRace: ElixirRaceEntry[] = [

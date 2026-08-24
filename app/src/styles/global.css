@@ -1483,3 +1483,66 @@ tbody td:first-child {
     grid-template-columns: 1fr;
   }
 }
+
+/* CARAVAN ROLL */
+.caravan-roll-bar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+.caravan-roll-btn {
+  padding: 12px 20px;
+}
+@keyframes dice-spin {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.15);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+.caravan-roll-btn.rolling svg {
+  animation: dice-spin 0.5s linear infinite;
+}
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.modal-card {
+  width: 340px;
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+.modal-title {
+  font-family: var(--display);
+  font-size: 18px;
+  color: var(--gold-lt);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+.modal-draw-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.modal-draw-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--ink3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+}

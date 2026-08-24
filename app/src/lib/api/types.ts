@@ -39,15 +39,31 @@ export interface AlliancePlayer {
   isSelf?: boolean;
 }
 
-export type CaravanFlag = 'страж' | 'vip';
+/**
+ * A player's role on a caravan run. Every run has exactly one 'кучер' (coachman) and one
+ * escort riding beside them — either 'страж' (guard) or 'vip'; which of those two the escort
+ * gets is a separate rule still to be defined, so the draw picks between them arbitrarily for now.
+ */
+export type CaravanRole = 'кучер' | 'страж' | 'vip';
+export type CaravanEscortRole = 'страж' | 'vip';
 
-export interface CaravanEntry {
+export interface CaravanMember {
   nick: string;
   group: PlayerGroup;
   level: number;
-  flag: CaravanFlag;
-  lastAssignedDate: string;
   isSelf?: boolean;
+}
+
+/** One caravan run's outcome — always a coachman plus one escort, never a lone player. */
+export interface CaravanDraw {
+  coachman: CaravanMember;
+  escort: CaravanMember;
+  escortRole: CaravanEscortRole;
+}
+
+export interface CaravanRun extends CaravanDraw {
+  id: string;
+  lastAssignedDate: string;
 }
 
 export type FormationRole = 'attacker' | 'mixed' | 'defender' | 'none';

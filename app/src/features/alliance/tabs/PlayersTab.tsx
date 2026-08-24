@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Badge } from '../../../components/ui/Badge';
+import { Badge, GROUP_BADGE_VARIANT } from '../../../components/ui/Badge';
 import { EditIcon, TrashIcon } from '../../../components/ui/ActionIcons';
 import { Button } from '../../../components/ui/Button';
 import { TableWrap } from '../../../components/ui/TableWrap';
@@ -105,7 +105,7 @@ export function PlayersTab() {
                   </td>
                   <td>{player.level}</td>
                   <td>
-                    <Badge variant="gold">{player.group}</Badge>
+                    <Badge variant={GROUP_BADGE_VARIANT[player.group]}>{player.group}</Badge>
                   </td>
                   <td>{formatPowerM(player.totalPowerM)}</td>
                   <td>{player.playstyle}</td>

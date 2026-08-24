@@ -1,5 +1,5 @@
 import { Fragment, useMemo } from 'react';
-import { Badge } from '../../../components/ui/Badge';
+import { Badge, GROUP_BADGE_VARIANT } from '../../../components/ui/Badge';
 import { useContribution } from '../../../lib/api/hooks';
 
 const PX_PER_MILLION = 12;
@@ -171,7 +171,7 @@ export function ContributionScale() {
         >
           <span className="contrib-row-nick">{entry.nick}</span>
           <span className="contrib-row-points">{formatPoints(entry.points)}</span>
-          <Badge variant="gold">{entry.group}</Badge>
+          <Badge variant={GROUP_BADGE_VARIANT[entry.group]}>{entry.group}</Badge>
         </div>
       ))}
     </div>

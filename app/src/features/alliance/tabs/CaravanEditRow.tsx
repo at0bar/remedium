@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Badge } from '../../../components/ui/Badge';
+import { Badge, GROUP_BADGE_VARIANT } from '../../../components/ui/Badge';
 import { CancelIcon, SaveIcon } from '../../../components/ui/ActionIcons';
 import { Button } from '../../../components/ui/Button';
 import { useAlliancePlayers } from '../../../lib/api/hooks';
@@ -79,7 +79,7 @@ export function CaravanEditRow({
           ) : (
             <PlayerPicker roster={roster} value={coachman} excludeNick={escort.nick} onChange={setCoachman} />
           )}
-          <Badge variant="gold">{coachman.group}</Badge>
+          <Badge variant={GROUP_BADGE_VARIANT[coachman.group]}>{coachman.group}</Badge>
           <span style={{ color: 'var(--text2)', fontSize: 12, whiteSpace: 'nowrap' }}>{coachman.level} ур.</span>
         </div>
       </td>
@@ -92,7 +92,7 @@ export function CaravanEditRow({
           ) : (
             <PlayerPicker roster={roster} value={escort} excludeNick={coachman.nick} onChange={setEscort} />
           )}
-          <Badge variant="gold">{escort.group}</Badge>
+          <Badge variant={GROUP_BADGE_VARIANT[escort.group]}>{escort.group}</Badge>
           <span style={{ color: 'var(--text2)', fontSize: 12, whiteSpace: 'nowrap' }}>{escort.level} ур.</span>
         </div>
       </td>

@@ -439,6 +439,11 @@ body::before {
   color: var(--purple);
   border: 1px solid rgba(167, 139, 250, 0.2);
 }
+.bslate {
+  background: var(--slate-dim);
+  color: var(--slate);
+  border: 1px solid rgba(138, 142, 154, 0.2);
+}
 
 /* CLASS TEXT */
 .cls-tank {

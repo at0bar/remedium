@@ -2,13 +2,17 @@ import { useState, type FormEvent } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 
+type Mode = 'login' | 'register';
+
 export function LoginPage() {
-  const { user, login } = useAuth();
+  const { user, login, register } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [mode, setMode] = useState<Mode>('login');
   const [nick, setNick] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
 
   if (user) {
     const from = (location.state as { from?: Location })?.from?.pathname ?? '/profile';
@@ -22,9 +26,17 @@ export function LoginPage() {
       setError('Введите ник и пароль.');
       return;
     }
-    const ok = await login(nick, password);
-    if (!ok) {
-      setError('Неверный пароль.');
+    if (mode === 'register' && password.length < 6) {
+      setError('Пароль должен быть не короче 6 символов.');
+      return;
+    }
+
+    setPending(true);
+    const result = mode === 'login' ? await login(nick, password) : await register(nick, password);
+    setPending(false);
+
+    if (!result.ok) {
+      setError(result.error);
       return;
     }
     navigate('/profile', { replace: true });
@@ -60,13 +72,23 @@ export function LoginPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
+            autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
           />
         </div>
-        <button className="auth-btn" type="submit">
-          Войти
+        <button className="auth-btn" type="submit" disabled={pending}>
+          {mode === 'login' ? 'Войти' : 'Зарегистрироваться'}
         </button>
         {error && <div className="auth-error">{error}</div>}
+        <button
+          type="button"
+          className="auth-link"
+          onClick={() => {
+            setMode(mode === 'login' ? 'register' : 'login');
+            setError(null);
+          }}
+        >
+          {mode === 'login' ? 'Впервые здесь? Зарегистрироваться' : 'Уже есть аккаунт? Войти'}
+        </button>
       </form>
     </div>
   );

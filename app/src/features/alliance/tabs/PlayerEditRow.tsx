@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { CancelIcon, SaveIcon } from '../../../components/ui/ActionIcons';
 import { Button } from '../../../components/ui/Button';
+import { useAuth } from '../../auth/AuthContext';
 import { formatPowerM } from '../../../lib/format';
 import type { AlliancePlayer, PlayerGroup, Playstyle } from '../../../lib/api/types';
 
@@ -16,6 +17,9 @@ export function PlayerEditRow({
   onSave: (data: Omit<AlliancePlayer, 'id' | 'isSelf'>) => void;
   onCancel: () => void;
 }) {
+  const { user } = useAuth();
+  const canEditGroup = !initial?.isSelf || (user?.canEdit ?? false);
+
   const [nick, setNick] = useState(initial?.nick ?? '');
   const [level, setLevel] = useState(initial?.level ?? 1);
   const [group, setGroup] = useState<PlayerGroup>(initial?.group ?? 'R1');
@@ -43,13 +47,19 @@ export function PlayerEditRow({
         />
       </td>
       <td>
-        <select className="auth-input" value={group} onChange={(e) => setGroup(e.target.value as PlayerGroup)}>
-          {GROUPS.map((g) => (
-            <option key={g} value={g}>
-              {g}
-            </option>
-          ))}
-        </select>
+        {canEditGroup ? (
+          <select className="auth-input" value={group} onChange={(e) => setGroup(e.target.value as PlayerGroup)}>
+            {GROUPS.map((g) => (
+              <option key={g} value={g}>
+                {g}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <span style={{ color: 'var(--text2)', fontSize: 13 }} title="Смену группы подтверждает редактор">
+            {group}
+          </span>
+        )}
       </td>
       <td>
         {initial?.isSelf ? (

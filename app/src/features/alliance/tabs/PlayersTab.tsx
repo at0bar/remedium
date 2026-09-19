@@ -3,6 +3,7 @@ import { Badge, GROUP_BADGE_VARIANT } from '../../../components/ui/Badge';
 import { EditIcon, TrashIcon } from '../../../components/ui/ActionIcons';
 import { Button } from '../../../components/ui/Button';
 import { TableWrap } from '../../../components/ui/TableWrap';
+import { useAuth } from '../../auth/AuthContext';
 import { useAddPlayer, useAlliancePlayers, useDeletePlayer, useUpdatePlayer } from '../../../lib/api/hooks';
 import { formatPowerM } from '../../../lib/format';
 import type { AlliancePlayer, PlayerGroup } from '../../../lib/api/types';
@@ -34,6 +35,8 @@ function sortPlayers(players: AlliancePlayer[], mode: SortMode): AlliancePlayer[
 }
 
 export function PlayersTab() {
+  const { user } = useAuth();
+  const canEdit = user?.canEdit ?? false;
   const { data: players, isLoading } = useAlliancePlayers();
   const [sortMode, setSortMode] = useState<SortMode>('group-power');
   const addPlayer = useAddPlayer();
@@ -111,26 +114,30 @@ export function PlayersTab() {
                   <td>{player.playstyle}</td>
                   <td className="tbl-actions">
                     <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-                      <Button
-                        variant="neutral"
-                        size="sm"
-                        iconOnly
-                        aria-label="Редактировать"
-                        title="Редактировать"
-                        onClick={() => setEditingId(player.id)}
-                      >
-                        <EditIcon />
-                      </Button>
-                      <Button
-                        variant="red"
-                        size="sm"
-                        iconOnly
-                        aria-label="Удалить"
-                        title="Удалить"
-                        onClick={() => deletePlayer.mutate(player.id)}
-                      >
-                        <TrashIcon />
-                      </Button>
+                      {(canEdit || player.isSelf) && (
+                        <Button
+                          variant="neutral"
+                          size="sm"
+                          iconOnly
+                          aria-label="Редактировать"
+                          title="Редактировать"
+                          onClick={() => setEditingId(player.id)}
+                        >
+                          <EditIcon />
+                        </Button>
+                      )}
+                      {canEdit && (
+                        <Button
+                          variant="red"
+                          size="sm"
+                          iconOnly
+                          aria-label="Удалить"
+                          title="Удалить"
+                          onClick={() => deletePlayer.mutate(player.id)}
+                        >
+                          <TrashIcon />
+                        </Button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -147,7 +154,7 @@ export function PlayersTab() {
         </table>
       </TableWrap>
 
-      {editingId !== 'new' && (
+      {canEdit && editingId !== 'new' && (
         <div style={{ marginTop: 12 }}>
           <Button variant="gold" onClick={() => setEditingId('new')}>
             + Добавить игрока

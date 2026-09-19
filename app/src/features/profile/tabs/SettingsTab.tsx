@@ -3,13 +3,13 @@ import { SaveIcon } from '../../../components/ui/ActionIcons';
 import { Button } from '../../../components/ui/Button';
 import { Callout } from '../../../components/ui/Callout';
 import { Card, CardTitle } from '../../../components/ui/Card';
-import { useAuth } from '../../auth/AuthContext';
+import { trpc } from '../../../lib/api/trpcClient';
 import { useProfile, useUpdateNick } from '../../../lib/api/hooks';
 
 export function SettingsTab() {
   const { data: profile } = useProfile();
   const updateNick = useUpdateNick();
-  const { setPassword } = useAuth();
+  const changePassword = trpc.auth.changePassword.useMutation();
 
   const [nick, setNick] = useState('');
   useEffect(() => {
@@ -17,14 +17,12 @@ export function SettingsTab() {
   }, [profile?.nick]);
   const nickChanged = Boolean(profile) && nick.trim() !== '' && nick.trim() !== profile?.nick;
 
-  const [password, setPasswordInput] = useState('');
-  const [passwordSaved, setPasswordSaved] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
 
   return (
     <>
-      <Callout kind="info">
-        Ник и пароль сохраняются локально в этом браузере — до подключения бэкенда это не настоящий аккаунт.
-      </Callout>
+      <Callout kind="info">Ник виден всем в ростере альянса. Пароль знаете только вы.</Callout>
       <Card>
         <CardTitle>Аккаунт</CardTitle>
         <div className="auth-field">
@@ -49,22 +47,35 @@ export function SettingsTab() {
               <SaveIcon />
             </Button>
           </div>
+          {updateNick.isError && (
+            <div style={{ color: 'var(--red)', fontSize: 12, marginTop: 6 }}>{updateNick.error.message}</div>
+          )}
         </div>
         <div className="auth-field">
-          <label className="auth-label" htmlFor="settings-password">
+          <label className="auth-label" htmlFor="settings-current-password">
+            Текущий пароль
+          </label>
+          <input
+            id="settings-current-password"
+            className="auth-input"
+            type="password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            autoComplete="current-password"
+          />
+        </div>
+        <div className="auth-field">
+          <label className="auth-label" htmlFor="settings-new-password">
             Новый пароль
           </label>
           <div style={{ display: 'flex', gap: 8 }}>
             <input
-              id="settings-password"
+              id="settings-new-password"
               className="auth-input"
               type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => {
-                setPasswordInput(e.target.value);
-                setPasswordSaved(false);
-              }}
+              placeholder="не короче 6 символов"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
               autoComplete="new-password"
             />
             <Button
@@ -72,20 +83,24 @@ export function SettingsTab() {
               iconOnly
               aria-label="Сохранить"
               title="Сохранить"
-              disabled={!password}
-              onClick={() => {
-                setPassword(password);
-                setPasswordInput('');
-                setPasswordSaved(true);
-              }}
+              disabled={!currentPassword || newPassword.length < 6 || changePassword.isPending}
+              onClick={() =>
+                changePassword.mutate(
+                  { currentPassword, newPassword },
+                  { onSuccess: () => { setCurrentPassword(''); setNewPassword(''); } },
+                )
+              }
             >
               <SaveIcon />
             </Button>
           </div>
-          {passwordSaved && (
+          {changePassword.isSuccess && (
             <div style={{ color: 'var(--teal)', fontSize: 12, marginTop: 6 }}>
               Пароль обновлён — используйте его при следующем входе.
             </div>
+          )}
+          {changePassword.isError && (
+            <div style={{ color: 'var(--red)', fontSize: 12, marginTop: 6 }}>{changePassword.error.message}</div>
           )}
         </div>
       </Card>

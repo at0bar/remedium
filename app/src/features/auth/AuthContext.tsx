@@ -1,68 +1,71 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { readLocalStore, writeLocalStore } from '../../lib/api/localStore';
-
-export type SiteRole = 'member' | 'officer';
+import { TRPCClientError } from '@trpc/client';
+import { createContext, useContext, type ReactNode } from 'react';
+import { trpc } from '../../lib/api/trpcClient';
 
 export interface AuthUser {
+  playerId: string;
   nick: string;
-  role: SiteRole;
+  canEdit: boolean;
 }
+
+type AuthResult = { ok: true } | { ok: false; error: string };
 
 interface AuthContextValue {
   user: AuthUser | null;
-  login: (nick: string, password: string) => Promise<boolean>;
+  isLoading: boolean;
+  login: (nick: string, password: string) => Promise<AuthResult>;
+  register: (nick: string, password: string) => Promise<AuthResult>;
   logout: () => void;
-  setPassword: (password: string) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-const STORAGE_KEY = 'remedium.mock-auth-user';
-const PASSWORD_KEY = 'auth:password';
-
-/**
- * MOCK auth — placeholder for the future backend-issued JWT/cookie session.
- * Accepts any non-empty nick/password until a password is set via Settings,
- * after which login checks against it; nicks "admin" or "officer" get the
- * officer role (used to gate future edit-only UI), everything else is a
- * read-only member. Replace with a real API call once the backend exists.
- */
-function mockAuthenticate(nick: string, password: string): AuthUser | null {
-  const trimmed = nick.trim();
-  if (!trimmed || !password) return null;
-  const savedPassword = readLocalStore<string | null>(PASSWORD_KEY, null);
-  if (savedPassword !== null && password !== savedPassword) return null;
-  const role: SiteRole = ['admin', 'officer'].includes(trimmed.toLowerCase()) ? 'officer' : 'member';
-  return { nick: trimmed, role };
+function errorMessage(err: unknown): string {
+  if (err instanceof TRPCClientError) return err.message;
+  return 'Что-то пошло не так, попробуйте ещё раз.';
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as AuthUser) : null;
-  });
+  const utils = trpc.useUtils();
+  const meQuery = trpc.auth.me.useQuery();
+  const loginMutation = trpc.auth.login.useMutation();
+  const registerMutation = trpc.auth.register.useMutation();
+  const logoutMutation = trpc.auth.logout.useMutation();
 
-  useEffect(() => {
-    if (user) localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-    else localStorage.removeItem(STORAGE_KEY);
-  }, [user]);
+  async function login(nick: string, password: string): Promise<AuthResult> {
+    try {
+      const user = await loginMutation.mutateAsync({ nick, password });
+      utils.auth.me.setData(undefined, user);
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, error: errorMessage(err) };
+    }
+  }
 
-  async function login(nick: string, password: string) {
-    const result = mockAuthenticate(nick, password);
-    if (!result) return false;
-    setUser(result);
-    return true;
+  async function register(nick: string, password: string): Promise<AuthResult> {
+    try {
+      const user = await registerMutation.mutateAsync({ nick, password });
+      utils.auth.me.setData(undefined, user);
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, error: errorMessage(err) };
+    }
   }
 
   function logout() {
-    setUser(null);
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => {
+        utils.auth.me.setData(undefined, null);
+        utils.invalidate();
+      },
+    });
   }
 
-  function setPassword(password: string) {
-    writeLocalStore(PASSWORD_KEY, password);
-  }
-
-  return <AuthContext.Provider value={{ user, login, logout, setPassword }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user: meQuery.data ?? null, isLoading: meQuery.isLoading, login, register, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

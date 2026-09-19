@@ -59,6 +59,13 @@ export interface CaravanDraw {
   coachman: CaravanMember;
   escort: CaravanMember;
   escortRole: CaravanEscortRole;
+  /**
+   * Carried through from `roll` to `confirm` (see useAddCaravanRun) — not for display.
+   * Optional only because `CaravanRun` extends this shape and its own `list` query doesn't
+   * carry player ids; an actual roll result always has both.
+   */
+  coachmanPlayerId?: string;
+  escortPlayerId?: string;
 }
 
 export interface CaravanRun extends CaravanDraw {

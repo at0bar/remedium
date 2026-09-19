@@ -3,6 +3,7 @@ import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
 import { DiceIcon, EditIcon } from '../../../components/ui/ActionIcons';
 import { TableWrap } from '../../../components/ui/TableWrap';
+import { useAuth } from '../../auth/AuthContext';
 import { useAddCaravanRun, useAlliancePlayers, useCaravan, useRollCaravan, useUpdateCaravanRun } from '../../../lib/api/hooks';
 import { formatDate } from '../../../lib/format';
 import type { CaravanDraw } from '../../../lib/api/types';
@@ -13,6 +14,8 @@ import { CaravanRollModal, ROLE_BADGE } from './CaravanRollModal';
 const ROLL_ANIMATION_MS = 2000;
 
 export function CaravanTab() {
+  const { user } = useAuth();
+  const canEdit = user?.canEdit ?? false;
   const { data: runs, isLoading } = useCaravan();
   const { data: players } = useAlliancePlayers();
   const rollCaravan = useRollCaravan();
@@ -47,17 +50,19 @@ export function CaravanTab() {
 
   return (
     <>
-      <div className="caravan-roll-bar">
-        <Button
-          variant="gold"
-          className={`caravan-roll-btn${rolling ? ' rolling' : ''}`}
-          onClick={handleRoll}
-          disabled={rolling || !players || players.length < 2}
-        >
-          <DiceIcon />
-          {rolling ? 'Крутим…' : 'Разыграть'}
-        </Button>
-      </div>
+      {canEdit && (
+        <div className="caravan-roll-bar">
+          <Button
+            variant="gold"
+            className={`caravan-roll-btn${rolling ? ' rolling' : ''}`}
+            onClick={handleRoll}
+            disabled={rolling || !players || players.length < 2}
+          >
+            <DiceIcon />
+            {rolling ? 'Крутим…' : 'Разыграть'}
+          </Button>
+        </div>
+      )}
 
       <TableWrap>
         <table className="tbl-fixed">
@@ -99,16 +104,18 @@ export function CaravanTab() {
                   </td>
                   <td>{formatDate(run.lastAssignedDate)}</td>
                   <td className="tbl-actions">
-                    <Button
-                      variant="neutral"
-                      size="sm"
-                      iconOnly
-                      aria-label="Редактировать"
-                      title="Редактировать"
-                      onClick={() => setEditingId(run.id)}
-                    >
-                      <EditIcon />
-                    </Button>
+                    {canEdit && (
+                      <Button
+                        variant="neutral"
+                        size="sm"
+                        iconOnly
+                        aria-label="Редактировать"
+                        title="Редактировать"
+                        onClick={() => setEditingId(run.id)}
+                      >
+                        <EditIcon />
+                      </Button>
+                    )}
                   </td>
                 </tr>
               ),

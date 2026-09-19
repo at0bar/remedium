@@ -1,6 +1,6 @@
 # last-asylum-alliance-manager
 
-Remedium — дашборд альянса **[Meow] Akatsukii**. Фронт (`app/`) — React SPA; бэкенд (`server/`) — Fastify + tRPC + SQLite. Домен и принятые решения см. в [CONTEXT.md](./CONTEXT.md) и [docs/adr/](./docs/adr/).
+Remedium — дашборд альянса **[Meow] Akatsukii**. Фронт (`app/`) — React SPA; бэкенд (`server/`) — Fastify + tRPC + SQLite. Домен и принятые решения см. в [CONTEXT.md](./CONTEXT.md) и [docs/adr/](./docs/adr/), структуру БД — в [docs/database.md](./docs/database.md), формат заливки CSV — в [docs/csv-import.md](./docs/csv-import.md).
 
 ## Разработка
 
@@ -20,20 +20,20 @@ npm run seed:player -- --nick Atobar --level 25 --group R3 --playstyle Фарм 
 
 Затем зарегистрируйтесь под этим ником — если он совпадает с `BOOTSTRAP_ADMIN_NICK`, аккаунт сразу получит право редактирования.
 
-## Деплой (Beget VPS + Docker)
+## Деплой
+
+Автоматический: пуш/мёрж в `master` triggers `.github/workflows/deploy.yml` — заходит по SSH на VPS (secrets `DEPLOY_HOST`/`DEPLOY_USER`/`DEPLOY_SSH_KEY`) и в `/opt/remedium` (настоящий `git clone`, не архив) делает `git reset --hard origin/master && docker compose up -d --build`.
+
+Вручную (первый раз на новом VPS, пользователь `deploy` в группе `docker`, не root):
 
 ```bash
-BOOTSTRAP_ADMIN_NICK=Atobar docker compose up -d --build
+git clone https://github.com/at0bar/remedium.git /opt/remedium && cd /opt/remedium
+printf 'BOOTSTRAP_ADMIN_NICK=Atobar\nHOST_PORT=80\nCOOKIE_SECURE=false\n' > .env   # COOKIE_SECURE=true только за настоящим TLS
+docker compose up -d --build
 ```
 
-Данные (SQLite-файл) живут в именованном volume `remedium-data`, миграции применяются автоматически при старте контейнера.
+Данные (SQLite-файл) живут в именованном volume (`<имя-каталога>_remedium-data` — поэтому каталог должен называться `remedium`), миграции применяются автоматически при старте контейнера.
 
 ## Заливка справочных данных (CSV)
 
-Гонка за элексиром, формация, статистика дуэлей и вклад — не редактируются через UI, а заливаются офицером через авторизованный HTTP-эндпоинт:
-
-```bash
-curl -b cookies.txt -F "file=@contribution.csv" http://<host>/api/import/contribution
-```
-
-Ресурсы: `elixir-race`, `formation`, `contribution`, `player-stats`, `weekly-rating` (для последнего дополнительно передаётся поле формы `weekStart`, например `-F weekStart=2026-09-13`). Требуется право редактирования.
+Гонка за элексиром, формация, статистика дуэлей и вклад — не редактируются через UI, а заливаются офицером через авторизованный HTTP-эндпоинт `POST /api/import/:resource`. Формат файлов по каждому ресурсу, поведение замены/накопления и примеры — в [docs/csv-import.md](./docs/csv-import.md).

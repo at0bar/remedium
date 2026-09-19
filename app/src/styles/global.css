@@ -1261,7 +1261,7 @@ tbody td:first-child {
 .wmap-svg {
   display: block;
 }
-.wmap-tile {
+.wmap-region {
   width: 100%;
   height: 100%;
   display: flex;

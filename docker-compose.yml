@@ -1,0 +1,20 @@
+services:
+  remedium:
+    build: .
+    restart: unless-stopped
+    ports:
+      - '${HOST_PORT:-3000}:3000'
+    environment:
+      NODE_ENV: production
+      # First registration matching this nick (case-insensitive) gets the edit-permission flag —
+      # see CONTEXT.md "Регистрация". Set to the real bootstrap nick before first run.
+      BOOTSTRAP_ADMIN_NICK: ${BOOTSTRAP_ADMIN_NICK:?set BOOTSTRAP_ADMIN_NICK before first run}
+      # true only once this deploy sits behind real TLS (own domain) — see docs/adr/0002 and
+      # server/src/trpc/routers/auth.ts. A bare-IP/no-domain deploy MUST leave this false, or
+      # browsers silently drop the session cookie and nobody stays logged in.
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    volumes:
+      - remedium-data:/app/data
+
+volumes:
+  remedium-data:

@@ -1,0 +1,61 @@
+/* Design tokens ported from DESIGN.md / index.html — see repo root DESIGN.md for the full spec. */
+:root {
+  --ink: #0d0e10;
+  --ink2: #13151a;
+  --ink3: #1a1d24;
+  --panel: #1f222b;
+  --border: rgba(255, 255, 255, 0.07);
+  --border2: rgba(255, 255, 255, 0.13);
+  --text: #d6d8e0;
+  --text2: #8a8e9a;
+  --text3: #555966;
+  --mono: 'Share Tech Mono', monospace;
+  --display: 'Barlow Condensed', sans-serif;
+  --body: 'Barlow', sans-serif;
+  --nav-w: 240px;
+  --radius: 6px;
+
+  /* Faction colours: Warrior=red, Ranger=blue, Warlock=green */
+  --warrior: #e05252;
+  --warrior-dim: rgba(224, 82, 82, 0.1);
+  --warrior-bd: rgba(224, 82, 82, 0.28);
+  --ranger: #5b9cf6;
+  --ranger-dim: rgba(91, 156, 246, 0.1);
+  --ranger-bd: rgba(91, 156, 246, 0.28);
+  --warlock: #4caf7a;
+  --warlock-dim: rgba(76, 175, 122, 0.1);
+  --warlock-bd: rgba(76, 175, 122, 0.28);
+
+  /* Class colours: Tank=amber, Carry=violet, Support=teal — no overlap with factions */
+  --tank: #e8a83e;
+  --tank-dim: rgba(232, 168, 62, 0.1);
+  --tank-bd: rgba(232, 168, 62, 0.28);
+  --carry: #a78bfa;
+  --carry-dim: rgba(167, 139, 250, 0.1);
+  --carry-bd: rgba(167, 139, 250, 0.28);
+  --support: #3ecfb2;
+  --support-dim: rgba(62, 207, 178, 0.1);
+  --support-bd: rgba(62, 207, 178, 0.28);
+
+  /* UI gold */
+  --gold: #c9a84c;
+  --gold-lt: #e8c96b;
+  --gold-dim: rgba(201, 168, 76, 0.12);
+
+  --red: #e05252;
+  --red-dim: rgba(224, 82, 82, 0.08);
+  --blue: #5b9cf6;
+  --blue-dim: rgba(91, 156, 246, 0.08);
+  --teal: #3ecfb2;
+  --teal-dim: rgba(62, 207, 178, 0.08);
+  --purple: #a78bfa;
+  --purple-dim: rgba(167, 139, 250, 0.08);
+  --slate: #8a8e9a;
+  --slate-dim: rgba(138, 142, 154, 0.08);
+
+  /* World-map region colours — factual map data, not a faction/class/status signal.
+     --map-neighbor coincidentally shares --warlock's hex; kept as a separate token
+     per DESIGN.md's own rule on such coincidences. */
+  --map-us: var(--gold);
+  --map-neighbor: #4caf7a;
+}

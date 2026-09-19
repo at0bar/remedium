@@ -1273,13 +1273,16 @@ tbody td:first-child {
   font-family: var(--mono);
   line-height: 1.25;
   box-sizing: border-box;
+  overflow: hidden;
+  overflow-wrap: break-word;
 }
 .wmap-label {
-  font-size: 10px;
+  width: 100%;
+  font-size: 9px;
   letter-spacing: 0.01em;
 }
 .wmap-value {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   margin-top: 2px;
 }
@@ -1287,9 +1290,9 @@ tbody td:first-child {
   color: var(--gold-lt);
   font-family: var(--display);
   font-weight: 700;
-  font-size: 15px;
+  font-size: 13px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
 }
 .wmap-legend {
   display: flex;

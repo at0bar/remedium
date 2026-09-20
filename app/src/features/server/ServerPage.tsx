@@ -16,7 +16,7 @@ const TABS = [
 export function ServerPage() {
   return (
     <section className="section">
-      <SectionHeader num="03 // СЕРВЕР" title="224" sub="Общая информация, правила и союзы сервера" />
+      <SectionHeader num="03 // СЕРВЕР" title="337" sub="Общая информация, правила и союзы сервера" />
       <TabBar tabs={TABS} />
       <Routes>
         <Route index element={<Navigate to="info" replace />} />

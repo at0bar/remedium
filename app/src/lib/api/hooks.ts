@@ -133,5 +133,12 @@ export function useContribution() {
 }
 
 export function useWeeklyRating() {
-  return trpc.weeklyRating.list.useQuery();
+  return trpc.contribution.history.useQuery();
+}
+
+export function useCreatePowerSnapshot() {
+  const utils = trpc.useUtils();
+  return trpc.powerSnapshot.create.useMutation({
+    onSuccess: () => utils.profile.get.invalidate(),
+  });
 }

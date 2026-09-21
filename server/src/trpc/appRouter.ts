@@ -4,9 +4,9 @@ import { contributionRouter } from './routers/contribution.js';
 import { elixirRaceRouter } from './routers/elixirRace.js';
 import { formationRouter } from './routers/formation.js';
 import { playersRouter } from './routers/players.js';
+import { powerSnapshotRouter } from './routers/powerSnapshot.js';
 import { profileRouter } from './routers/profile.js';
 import { squadsRouter } from './routers/squads.js';
-import { weeklyRatingRouter } from './routers/weeklyRating.js';
 import { router } from './trpc.js';
 
 export const appRouter = router({
@@ -17,8 +17,8 @@ export const appRouter = router({
   caravan: caravanRouter,
   elixirRace: elixirRaceRouter,
   formation: formationRouter,
-  weeklyRating: weeklyRatingRouter,
   contribution: contributionRouter,
+  powerSnapshot: powerSnapshotRouter,
 });
 
 export type AppRouter = typeof appRouter;

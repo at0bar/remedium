@@ -4,7 +4,7 @@ import type { FastifyInstance } from 'fastify';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 import { db } from '../db/client.js';
-import { contributionEntries, elixirRaceEntries, formationTiles, playerStats, ratingWeeks, weeklyRatingEntries } from '../db/schema.js';
+import { contributionEntries, elixirRaceEntries, formationTiles } from '../db/schema.js';
 
 const numeric = z.coerce.number();
 const nullableNumeric = z.preprocess((v) => (v === '' || v === undefined ? null : v), z.coerce.number().nullable());
@@ -23,27 +23,16 @@ const ROW_SCHEMAS = {
     power: nullableNumeric,
     role: z.enum(['attacker', 'mixed', 'defender', 'none']),
   }),
-  contribution: z.object({
-    nick: z.string().min(1),
-    group: z.enum(['R1', 'R2', 'R3', 'R4', 'R5']),
-    points: numeric,
-  }),
-  'player-stats': z.object({
-    nick: z.string().min(1),
-    avgDuelScore: numeric,
-    avgDuelRank: numeric,
-    strongerThanPercent: numeric,
-    weeklyPowerChangePercent: numeric,
-  }),
-  'weekly-rating': z.object({ nick: z.string().min(1), points: numeric }),
+  contribution: z.object({ nick: z.string().min(1), points: numeric }),
 } as const;
 
 /**
- * CSV bulk-import for the four (five, counting player-stats) read-only snapshot resources —
- * see CONTEXT.md "Импортируемые данные". Every resource except weekly-rating wholesale-replaces
- * its table on each import; weekly-rating appends/updates one week's worth of rows instead,
- * since it's inherently a trailing-weeks history. Every row is validated against ROW_SCHEMAS
- * before anything is written — a malformed CSV fails the whole import, not just a few rows.
+ * CSV bulk-import for the read-only snapshot resources — see CONTEXT.md "Импортируемые
+ * данные". `elixir-race` and `formation` wholesale-replace their table on each import;
+ * `contribution` ("Вклад", see CONTEXT.md / ADR 0003) instead replaces only the rows for the
+ * one week being imported, since it's a trailing-weeks history. Every row is validated against
+ * ROW_SCHEMAS before anything is written — a malformed CSV fails the whole import, not just a
+ * few rows.
  */
 const REPLACE_ALL_IMPORTERS: Record<string, (rows: Record<string, unknown>[]) => Promise<void>> = {
   'elixir-race': async (rows) => {
@@ -56,28 +45,12 @@ const REPLACE_ALL_IMPORTERS: Record<string, (rows: Record<string, unknown>[]) =>
     await db.delete(formationTiles);
     if (parsed.length) await db.insert(formationTiles).values(parsed.map((r) => ({ id: nanoid(), ...r })));
   },
-  contribution: async (rows) => {
-    const parsed = rows as z.infer<(typeof ROW_SCHEMAS)['contribution']>[];
-    await db.delete(contributionEntries);
-    if (parsed.length) await db.insert(contributionEntries).values(parsed.map((r) => ({ id: nanoid(), ...r })));
-  },
-  'player-stats': async (rows) => {
-    const parsed = rows as z.infer<(typeof ROW_SCHEMAS)['player-stats']>[];
-    await db.delete(playerStats);
-    if (parsed.length) await db.insert(playerStats).values(parsed.map((r) => ({ id: nanoid(), ...r })));
-  },
 };
 
-async function importWeeklyRating(rows: z.infer<(typeof ROW_SCHEMAS)['weekly-rating']>[], weekStart: string, label: string) {
-  let [week] = await db.select().from(ratingWeeks).where(eq(ratingWeeks.weekStart, weekStart)).limit(1);
-  if (!week) {
-    const id = nanoid();
-    await db.insert(ratingWeeks).values({ id, label, weekStart });
-    week = { id, label, weekStart };
-  }
-  await db.delete(weeklyRatingEntries).where(eq(weeklyRatingEntries.weekId, week.id));
+async function importContribution(rows: z.infer<(typeof ROW_SCHEMAS)['contribution']>[], weekStart: string) {
+  await db.delete(contributionEntries).where(eq(contributionEntries.weekStart, weekStart));
   if (rows.length) {
-    await db.insert(weeklyRatingEntries).values(rows.map((r) => ({ id: nanoid(), weekId: week.id, ...r })));
+    await db.insert(contributionEntries).values(rows.map((r) => ({ id: nanoid(), weekStart, ...r })));
   }
 }
 
@@ -102,11 +75,10 @@ export async function registerImportRoute(app: FastifyInstance) {
       return reply.code(400).send({ error: 'Файл не прошёл проверку.', issues: result.error.issues });
     }
 
-    if (resource === 'weekly-rating') {
+    if (resource === 'contribution') {
       const weekStart = (data.fields.weekStart as { value: string } | undefined)?.value;
-      const label = (data.fields.label as { value: string } | undefined)?.value ?? weekStart;
       if (!weekStart) return reply.code(400).send({ error: 'Не передана дата недели (weekStart).' });
-      await importWeeklyRating(result.data, weekStart, label ?? weekStart);
+      await importContribution(result.data, weekStart);
       return reply.send({ ok: true, imported: result.data.length });
     }
 

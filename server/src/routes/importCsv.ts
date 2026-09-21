@@ -21,7 +21,6 @@ const ROW_SCHEMAS = {
     y: numeric,
     nick: z.string().min(1),
     power: nullableNumeric,
-    role: z.enum(['attacker', 'mixed', 'defender', 'none']),
   }),
   contribution: z.object({ nick: z.string().min(1), points: numeric }),
 } as const;

@@ -7,7 +7,7 @@ import { players, squads } from '../../db/schema.js';
 import { editorProcedure, protectedProcedure, router } from '../trpc.js';
 
 const PLAYER_GROUPS = ['R1', 'R2', 'R3', 'R4', 'R5'] as const;
-const PLAYSTYLES = ['Фарм', 'Оборона', 'Смешанный'] as const;
+const PLAYSTYLES = ['attacker', 'defender', 'mixed', 'none'] as const;
 
 /**
  * Live squad power per player, summed across all their squads — reused wherever a real (not

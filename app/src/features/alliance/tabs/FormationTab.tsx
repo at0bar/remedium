@@ -1,5 +1,6 @@
 import { Badge } from '../../../components/ui/Badge';
 import { Callout } from '../../../components/ui/Callout';
+import { PLAYSTYLE_LABELS } from '../../../lib/playstyle';
 import { CoordinateFormationGrid } from './CoordinateFormationGrid';
 import { RegionMap } from './RegionMap';
 
@@ -25,10 +26,10 @@ export function FormationTab() {
         >
           Круговая оборона
         </span>
-        <Badge variant="red">Нападающий (кольцо)</Badge>
-        <Badge variant="gold">Смешанный</Badge>
-        <Badge variant="blue">Оборонящийся (центр)</Badge>
-        <Badge variant="neutral">Без стиля</Badge>
+        <Badge variant="red">{PLAYSTYLE_LABELS.attacker} (кольцо)</Badge>
+        <Badge variant="gold">{PLAYSTYLE_LABELS.mixed}</Badge>
+        <Badge variant="blue">{PLAYSTYLE_LABELS.defender} (центр)</Badge>
+        <Badge variant="neutral">{PLAYSTYLE_LABELS.none}</Badge>
       </div>
 
       <RegionMap>

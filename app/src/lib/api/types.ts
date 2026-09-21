@@ -1,5 +1,7 @@
 export type PlayerGroup = 'R1' | 'R2' | 'R3' | 'R4' | 'R5';
-export type Playstyle = 'Фарм' | 'Оборона' | 'Смешанный';
+/** See CONTEXT.md "Стиль игры", ADR 0005 — the same attribute as the old FormationRole, now
+ * unified onto the player. Russian display labels live in `lib/playstyle.ts`. */
+export type Playstyle = 'attacker' | 'defender' | 'mixed' | 'none';
 
 export interface Squad {
   id: string;
@@ -73,15 +75,14 @@ export interface CaravanRun extends CaravanDraw {
   lastAssignedDate: string;
 }
 
-export type FormationRole = 'attacker' | 'mixed' | 'defender' | 'none';
-
 export interface FormationTile {
   x: number;
   y: number;
   nick: string;
   /** Raw power value as shown on the source screenshot — unit wasn't labeled there, kept as-is. */
   power: number | null;
-  role: FormationRole;
+  /** Joined live from the player's `playstyle` — not its own stored field, see ADR 0005. */
+  role: Playstyle;
   isSelf?: boolean;
 }
 

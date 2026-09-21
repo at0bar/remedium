@@ -8,6 +8,7 @@ import { StatTile } from '../../../components/ui/StatTile';
 import { SquadBlock } from '../../../components/ui/SquadBlock';
 import { useAddSquad, useDeleteSquad, useProfile, useUpdateSquad } from '../../../lib/api/hooks';
 import { formatDate, formatPercentChange, formatPowerM, sumPowerM } from '../../../lib/format';
+import { PLAYSTYLE_LABELS } from '../../../lib/playstyle';
 import { SquadEditForm } from './SquadEditForm';
 
 export function OverviewTab() {
@@ -59,7 +60,7 @@ export function OverviewTab() {
                   : 'muted'
           }
         />
-        <StatTile value={profile.playstyle} label="Стиль игры" />
+        <StatTile value={PLAYSTYLE_LABELS[profile.playstyle]} label="Стиль игры" />
         <StatTile value={`${profile.coords.x}:${profile.coords.y}`} label="Координаты" sub={`Мифриловый зал`} />
       </div>
 

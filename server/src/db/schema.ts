@@ -123,3 +123,13 @@ export const powerSnapshotEntries = sqliteTable('power_snapshot_entries', {
   playerId: text('player_id').notNull().references(() => players.id, { onDelete: 'cascade' }),
   powerM: real('power_m').notNull(),
 });
+
+/**
+ * Generic alliance-wide key-value settings (see ADR 0006) — starts out holding the "Порог
+ * группы" values (`groupThresholdR1R2`, `groupThresholdR2R3`), but the shape is deliberately
+ * open-ended so future settings don't need their own migration/table.
+ */
+export const settings = sqliteTable('settings', {
+  key: text('key').primaryKey(),
+  value: text('value').notNull(),
+});

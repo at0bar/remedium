@@ -4,11 +4,13 @@ import { integer, real, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlit
 // Mirrors the literal unions in app/src/lib/api/types.ts — kept local so `server/` has no
 // dependency on `app/` (only `app/` type-imports `server/`, never the other way around).
 export type PlayerGroup = 'R1' | 'R2' | 'R3' | 'R4' | 'R5';
-export type Playstyle = 'Фарм' | 'Оборона' | 'Смешанный';
+/** See CONTEXT.md "Стиль игры", ADR 0005 — единственный атрибут манеры игры игрока, ранее
+ * ошибочно продублированный отдельным `FormationRole` на `formationTiles`. `none` — осознанный
+ * дефолт "стиль не определён". */
+export type Playstyle = 'attacker' | 'defender' | 'mixed' | 'none';
 export type CaravanEscortRole = 'страж' | 'vip';
 export type ElixirTeam = 'Основа А' | 'Основа Б' | 'Резерв А' | 'Резерв Б' | 'Не зарегистрирован';
 export type ElixirParticipation = 'Да' | 'Нет' | 'Не знает';
-export type FormationRole = 'attacker' | 'mixed' | 'defender' | 'none';
 
 /**
  * Roster row — one alliance member's in-game data. Not a login; see `accounts`.
@@ -77,13 +79,14 @@ export const elixirRaceEntries = sqliteTable('elixir_race_entries', {
   participation: text('participation').notNull().$type<ElixirParticipation>(),
 });
 
+/** `role` isn't stored here — it's the same "Стиль игры" as `players.playstyle` (see ADR 0005),
+ * joined live by nick when formation tiles are read. */
 export const formationTiles = sqliteTable('formation_tiles', {
   id: text('id').primaryKey(),
   x: integer('x').notNull(),
   y: integer('y').notNull(),
   nick: text('nick').notNull(),
   power: integer('power'),
-  role: text('role').notNull().$type<FormationRole>(),
 });
 
 /**

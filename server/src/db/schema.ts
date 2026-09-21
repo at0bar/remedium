@@ -66,9 +66,8 @@ export const caravanRuns = sqliteTable('caravan_runs', {
 });
 
 /**
- * The four tables below are CSV-imported snapshots (see CONTEXT.md "Импортируемые данные") —
- * no app CRUD yet, wholesale-replaced by an officer's import except weeklyRatingEntries,
- * which is append-only across weeks (see importCsv.ts for the per-resource replace/append split).
+ * `elixirRaceEntries` and `formationTiles` are CSV-imported snapshots (see CONTEXT.md
+ * "Импортируемые данные") — no app CRUD yet, wholesale-replaced on every officer import.
  */
 export const elixirRaceEntries = sqliteTable('elixir_race_entries', {
   id: text('id').primaryKey(),
@@ -87,37 +86,37 @@ export const formationTiles = sqliteTable('formation_tiles', {
   role: text('role').notNull().$type<FormationRole>(),
 });
 
-export const ratingWeeks = sqliteTable('rating_weeks', {
-  id: text('id').primaryKey(),
-  label: text('label').notNull(),
-  weekStart: text('week_start').notNull().unique(),
-});
-
-export const weeklyRatingEntries = sqliteTable('weekly_rating_entries', {
-  id: text('id').primaryKey(),
-  weekId: text('week_id').notNull().references(() => ratingWeeks.id, { onDelete: 'cascade' }),
-  nick: text('nick').notNull(),
-  points: integer('points').notNull(),
-});
-
-export const contributionEntries = sqliteTable('contribution_entries', {
-  id: text('id').primaryKey(),
-  nick: text('nick').notNull(),
-  group: text('group').notNull().$type<PlayerGroup>(),
-  points: integer('points').notNull(),
-});
+/**
+ * "Вклад" — weekly alliance-duel points per player (see CONTEXT.md "Вклад", ADR 0003). One
+ * row per (nick, weekStart); imported per-week (replace only that week, not the whole table —
+ * see importCsv.ts). `group` is intentionally not stored here — it's a live attribute of the
+ * player (`players.group`), not a fact about a past week. `avgDuelScore`/`avgDuelRank` on the
+ * Profile page are computed by averaging over this history (see ADR 0004), not stored fields.
+ */
+export const contributionEntries = sqliteTable(
+  'contribution_entries',
+  {
+    id: text('id').primaryKey(),
+    nick: text('nick').notNull(),
+    weekStart: text('week_start').notNull(),
+    points: integer('points').notNull(),
+  },
+  (table) => [uniqueIndex('contribution_entries_nick_week_idx').on(table.nick, table.weekStart)],
+);
 
 /**
- * Duel stats shown on the Profile page (`ProfileStats` minus `lastCoachmanDate`, which is
- * derived from `caravanRuns` instead — it's not an external metric, just a fact this DB
- * already tracks). Same CSV-imported-snapshot treatment as the four tables above; not
- * explicitly discussed with the user, inferred by analogy — flagged for them to confirm.
+ * A manually-triggered snapshot of every player's live squad power (see CONTEXT.md "Срез
+ * мощи", ADR 0004) — the baseline `weeklyPowerChangePercent` on the Profile page compares
+ * against. Independent cadence from "Вклад": an officer takes one whenever, not weekly.
  */
-export const playerStats = sqliteTable('player_stats', {
+export const powerSnapshots = sqliteTable('power_snapshots', {
   id: text('id').primaryKey(),
-  nick: text('nick').notNull(),
-  avgDuelScore: integer('avg_duel_score').notNull(),
-  avgDuelRank: integer('avg_duel_rank').notNull(),
-  strongerThanPercent: integer('stronger_than_percent').notNull(),
-  weeklyPowerChangePercent: real('weekly_power_change_percent').notNull(),
+  takenAt: text('taken_at').notNull().default(sql`(current_timestamp)`),
+});
+
+export const powerSnapshotEntries = sqliteTable('power_snapshot_entries', {
+  id: text('id').primaryKey(),
+  snapshotId: text('snapshot_id').notNull().references(() => powerSnapshots.id, { onDelete: 'cascade' }),
+  playerId: text('player_id').notNull().references(() => players.id, { onDelete: 'cascade' }),
+  powerM: real('power_m').notNull(),
 });

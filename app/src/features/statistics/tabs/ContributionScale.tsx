@@ -1,6 +1,9 @@
 import { Fragment, useMemo } from 'react';
 import { Badge, GROUP_BADGE_VARIANT } from '../../../components/ui/Badge';
-import { useContribution } from '../../../lib/api/hooks';
+import { useContribution, useSettings } from '../../../lib/api/hooks';
+
+const DEFAULT_R1_R2_THRESHOLD = 8_000_000;
+const DEFAULT_R2_R3_THRESHOLD = 30_000_000;
 
 const PX_PER_MILLION = 12;
 const MINOR_STEP = 1_000_000;
@@ -17,12 +20,6 @@ const RULER_W = 64; // ruler tick/label area, from RULER_X0
 const ROW_GAP = 32; // gap between the ruler's spine and the row list
 const ROW_X = RULER_X0 + RULER_W + ROW_GAP;
 const ROW_MIN_GAP = 26; // minimum vertical distance between two row centers
-
-const MILESTONES: { value: number; label: string; color?: string }[] = [
-  { value: 30_000_000, label: 'R3', color: 'var(--blue)' },
-  { value: 8_000_000, label: 'R2', color: 'var(--teal)' },
-  { value: 0, label: 'R1' },
-];
 
 function formatPoints(n: number) {
   return n.toLocaleString('ru-RU');
@@ -66,6 +63,16 @@ function declutter(naiveYsAscending: number[], minGap: number): number[] {
 
 export function ContributionScale() {
   const { data: entries, isLoading } = useContribution();
+  const { data: settings } = useSettings();
+
+  const milestones = useMemo(
+    () => [
+      { value: Number(settings?.groupThresholdR2R3 ?? DEFAULT_R2_R3_THRESHOLD), label: 'R3', color: 'var(--blue)' },
+      { value: Number(settings?.groupThresholdR1R2 ?? DEFAULT_R1_R2_THRESHOLD), label: 'R2', color: 'var(--teal)' },
+      { value: 0, label: 'R1' },
+    ],
+    [settings],
+  );
 
   const layout = useMemo(() => {
     if (!entries || entries.length === 0) return null;
@@ -143,7 +150,7 @@ export function ContributionScale() {
         ))}
       </svg>
 
-      {MILESTONES.map((m) => (
+      {milestones.map((m) => (
         <Fragment key={m.label}>
           <div
             className="contrib-milestone"

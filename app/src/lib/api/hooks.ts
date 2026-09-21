@@ -142,3 +142,14 @@ export function useCreatePowerSnapshot() {
     onSuccess: () => utils.profile.get.invalidate(),
   });
 }
+
+export function useSettings() {
+  return trpc.settings.get.useQuery();
+}
+
+export function useUpdateSetting() {
+  const utils = trpc.useUtils();
+  return trpc.settings.update.useMutation({
+    onSuccess: (settings) => utils.settings.get.setData(undefined, settings),
+  });
+}

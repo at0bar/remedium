@@ -6,12 +6,14 @@ export function sumPowerM(values: number[]): number {
   return Math.round(values.reduce((sum, v) => sum + v, 0) * 100) / 100;
 }
 
-export function formatPercentChange(percent: number): string {
+export function formatPercentChange(percent: number | null): string {
+  if (percent === null) return '—';
   const sign = percent > 0 ? '+' : '';
   return `${sign}${percent}%`;
 }
 
-export function formatDate(iso: string): string {
+export function formatDate(iso: string | null): string {
+  if (!iso) return '—';
   const [year, month, day] = iso.split('-');
   return `${day}.${month}.${year}`;
 }

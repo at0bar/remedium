@@ -7,7 +7,7 @@ export function StatTile({
   value: string;
   label: string;
   sub?: string;
-  subTone?: 'muted' | 'positive';
+  subTone?: 'muted' | 'positive' | 'negative';
 }) {
   return (
     <div className="stat-tile">

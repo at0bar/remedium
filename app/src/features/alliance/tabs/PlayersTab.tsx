@@ -4,7 +4,7 @@ import { EditIcon, TrashIcon } from '../../../components/ui/ActionIcons';
 import { Button } from '../../../components/ui/Button';
 import { TableWrap } from '../../../components/ui/TableWrap';
 import { useAuth } from '../../auth/AuthContext';
-import { useAddPlayer, useAlliancePlayers, useDeletePlayer, useUpdatePlayer } from '../../../lib/api/hooks';
+import { useAddPlayer, useAlliancePlayers, useCreatePowerSnapshot, useDeletePlayer, useUpdatePlayer } from '../../../lib/api/hooks';
 import { formatPowerM } from '../../../lib/format';
 import type { AlliancePlayer, PlayerGroup } from '../../../lib/api/types';
 import { PlayerEditRow } from './PlayerEditRow';
@@ -42,6 +42,7 @@ export function PlayersTab() {
   const addPlayer = useAddPlayer();
   const updatePlayer = useUpdatePlayer();
   const deletePlayer = useDeletePlayer();
+  const createPowerSnapshot = useCreatePowerSnapshot();
   const [editingId, setEditingId] = useState<string | 'new' | null>(null);
 
   const sorted = useMemo(() => sortPlayers(players ?? [], sortMode), [players, sortMode]);
@@ -52,22 +53,34 @@ export function PlayersTab() {
 
   return (
     <>
-      <div className="auth-field" style={{ maxWidth: 320 }}>
-        <label className="auth-label" htmlFor="players-sort">
-          Сортировка
-        </label>
-        <select
-          id="players-sort"
-          className="auth-input"
-          value={sortMode}
-          onChange={(e) => setSortMode(e.target.value as SortMode)}
-        >
-          {(Object.keys(SORT_LABELS) as SortMode[]).map((mode) => (
-            <option key={mode} value={mode}>
-              {SORT_LABELS[mode]}
-            </option>
-          ))}
-        </select>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12, flexWrap: 'wrap' }}>
+        <div className="auth-field" style={{ maxWidth: 320 }}>
+          <label className="auth-label" htmlFor="players-sort">
+            Сортировка
+          </label>
+          <select
+            id="players-sort"
+            className="auth-input"
+            value={sortMode}
+            onChange={(e) => setSortMode(e.target.value as SortMode)}
+          >
+            {(Object.keys(SORT_LABELS) as SortMode[]).map((mode) => (
+              <option key={mode} value={mode}>
+                {SORT_LABELS[mode]}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {canEdit && (
+          <Button
+            variant="neutral"
+            disabled={createPowerSnapshot.isPending}
+            onClick={() => createPowerSnapshot.mutate()}
+          >
+            Зафиксировать срез мощи
+          </Button>
+        )}
       </div>
 
       <TableWrap>

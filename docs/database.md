@@ -1,6 +1,6 @@
 # База данных
 
-SQLite (файл, путь задаётся `DB_PATH`) через Drizzle. Источник истины — `server/src/db/schema.ts`; этот файл может отставать от него, при расхождении верить коду. Термины (`Account` vs `AlliancePlayer`, право редактирования и т.д.) — в [`CONTEXT.md`](../CONTEXT.md). Причины архитектурных решений — в [`docs/adr/`](./adr/).
+SQLite (файл, путь задаётся `DB_PATH`) через Drizzle. Источник истины — `server/src/db/schema.ts`; этот файл может отставать от него, при расхождении верить коду. Термины (`Account` vs `AlliancePlayer`, право редактирования, «Вклад», «Стиль игры», «Срез мощи» и т.д.) — в [`CONTEXT.md`](../CONTEXT.md). Причины архитектурных решений — в [`docs/adr/`](./adr/).
 
 ## Схема целиком
 
@@ -10,8 +10,9 @@ erDiagram
     PLAYERS ||--o{ SQUADS : "владеет"
     PLAYERS ||--o{ CARAVAN_RUNS : "кучер"
     PLAYERS ||--o{ CARAVAN_RUNS : "спутник"
+    PLAYERS ||--o{ POWER_SNAPSHOT_ENTRIES : "мощь в срезе"
+    POWER_SNAPSHOTS ||--o{ POWER_SNAPSHOT_ENTRIES : "содержит"
     ACCOUNTS ||--o{ SESSIONS : "сессии"
-    RATING_WEEKS ||--o{ WEEKLY_RATING_ENTRIES : "очки за неделю"
 
     PLAYERS {
         text id PK
@@ -19,7 +20,7 @@ erDiagram
         int level
         text group "R1..R5"
         real totalPowerM "ручной снапшот, кроме своей строки"
-        text playstyle "Фарм/Оборона/Смешанный"
+        text playstyle "attacker/defender/mixed/none"
         int coordsX "nullable"
         int coordsY "nullable"
         text createdAt
@@ -51,9 +52,19 @@ erDiagram
         text escortRole "страж/vip"
         text lastAssignedDate
     }
+    POWER_SNAPSHOTS {
+        text id PK
+        text takenAt
+    }
+    POWER_SNAPSHOT_ENTRIES {
+        text id PK
+        text snapshotId FK
+        text playerId FK
+        real powerM
+    }
 ```
 
-Остальные пять таблиц — CSV-импортируемые снапшоты (см. ниже), не связаны через FK с `players` (сопоставляются по `nick` на лету): `elixir_race_entries`, `formation_tiles`, `rating_weeks` + `weekly_rating_entries`, `contribution_entries`, `player_stats`.
+Остальные три таблицы — CSV-импортируемые снапшоты (см. ниже), не связаны через FK с `players` (сопоставляются по `nick` на лету): `elixir_race_entries`, `formation_tiles`, `contribution_entries`. Плюс отдельно — `settings`, generic key-value конфиг без FK и без снапшот-семантики.
 
 ## Таблицы
 
@@ -66,9 +77,9 @@ erDiagram
 | `id` | text (nanoid) | нет | — | PK |
 | `nick` | text | нет | — | Уникален по факту (проверяется в коде при регистрации/смене ника), но без DB-constraint |
 | `level` | integer | нет | — | |
-| `group` | text (`PlayerGroup`: `R1`\|`R2`\|`R3`\|`R4`\|`R5`) | нет | — | Смена своей группы требует `canEdit` — в игре её назначают R4-R5 |
-| `totalPowerM` | real | нет | `0` | **Ручной снапшот** для всех строк, КРОМЕ строки текущего вызывающего — та всегда пересчитывается на лету как сумма его же `squads.powerM` (см. `listPlayersWithPower` в `routers/players.ts`) |
-| `playstyle` | text (`Playstyle`: `Фарм`\|`Оборона`\|`Смешанный`) | нет | — | |
+| `group` | text (`PlayerGroup`: `R1`\|`R2`\|`R3`\|`R4`\|`R5`) | нет | — | Смена своей группы требует `canEdit` — в игре её назначают R4-R5. Пороги перехода между группами — см. `settings` ниже, они не назначают группу автоматически |
+| `totalPowerM` | real | нет | `0` | **Ручной снапшот** для всех строк, КРОМЕ строки текущего вызывающего — та всегда пересчитывается на лету как сумма его же `squads.powerM` (см. `sumPowerByPlayer`/`listPlayersWithPower` в `routers/players.ts`) |
+| `playstyle` | text (`Playstyle`: `attacker`\|`defender`\|`mixed`\|`none`) | нет | — | «Стиль игры» (см. CONTEXT.md, ADR 0005) — единственное поле на весь проект, формация читает его же по нику вместо собственного хранимого поля |
 | `coordsX`, `coordsY` | integer | да | — | Координаты базы игрока, самостоятельно редактируются |
 | `createdAt` | text (ISO datetime) | нет | `current_timestamp` | |
 
@@ -100,7 +111,7 @@ erDiagram
 | `id` | text (nanoid) | нет | — | PK |
 | `playerId` | text FK → `players.id`, `ON DELETE CASCADE` | нет | — | Владелец — редактирует только он сам (или редактор) |
 | `name` | text | нет | — | `"Отряд N"`, N — следующий свободный номер среди отрядов этого игрока |
-| `powerM` | real | нет | — | Мощь отряда, в миллионах |
+| `powerM` | real | нет | — | Мощь отряда, в миллионах. Сумма по игроку — источник и «живой» `totalPowerM`, и «Среза мощи» |
 | `heroes` | json (`string[]`, ровно 5 элементов) | нет | — | Пустой слот — `''` |
 
 ### `caravan_runs` — история назначений каравана
@@ -115,14 +126,45 @@ erDiagram
 | `escortRole` | text (`CaravanEscortRole`: `страж`\|`vip`) | нет | — | Правило выбора между ними — плейсхолдер (честный coin-flip), реальная логика ещё не определена |
 | `lastAssignedDate` | text (`YYYY-MM-DD`) | нет | — | |
 
+### `power_snapshots` + `power_snapshot_entries` — «Срез мощи»
+
+См. CONTEXT.md «Срез мощи», ADR 0004. Периодическая ручная фиксация (кнопка в UI, `canEdit`-only, `powerSnapshot.create`) суммарной боевой мощи всех игроков разом — независимая от «Вклада» сущность, каданс которой определяет офицер (не обязательно раз в неделю). Два последних `power_snapshots` — база для `weeklyPowerChangePercent` на странице профиля.
+
+В отличие от CSV-снапшотов ниже, эти таблицы **честно связаны FK с `players`**, а не сопоставляются по нику — значения приходят из живой суммы `squads.powerM`, а не из стороннего файла.
+
+**`power_snapshots`**
+
+| Колонка | Тип | Описание |
+|---|---|---|
+| `id` | text (nanoid) | PK |
+| `takenAt` | text (ISO datetime) | По умолчанию `current_timestamp` |
+
+**`power_snapshot_entries`**
+
+| Колонка | Тип | Описание |
+|---|---|---|
+| `id` | text (nanoid) | PK |
+| `snapshotId` | text FK → `power_snapshots.id`, `ON DELETE CASCADE` | |
+| `playerId` | text FK → `players.id`, `ON DELETE CASCADE` | |
+| `powerM` | real | Мощь игрока (сумма его `squads.powerM`) на момент среза |
+
+### `settings` — generic конфиг альянса
+
+Key-value хранилище (см. ADR 0006) — сейчас содержит только пороги групп (`groupThresholdR1R2`, `groupThresholdR2R3`), но специально не типизировано под конкретные ключи, чтобы будущие настройки не требовали новой миграции. Читать может любой залогиненный (`settings.get`), писать — только `canEdit` (`settings.update`, upsert по ключу).
+
+| Колонка | Тип | Описание |
+|---|---|---|
+| `key` | text | PK |
+| `value` | text | Хранится как строка независимо от смысла значения (сейчас — числа, распарсенные на фронте) |
+
 ---
 
 ## CSV-импортируемые снапшоты
 
-Общее: заполняются офицером через `POST /api/import/:resource` (требует `canEdit`), не через CRUD в приложении. Не связаны FK с `players` — сопоставление с текущим пользователем (`isSelf`) происходит на лету по совпадению `nick` при чтении. `nick` здесь может не входить в `players` вовсе (пул шире отслеживаемого ростера).
+Общее: заполняются офицером через `POST /api/import/:resource` (требует `canEdit`), не через CRUD в приложении. Не связаны FK с `players` — сопоставление с текущим пользователем (`isSelf`) происходит на лету по совпадению `nick` при чтении. `nick` здесь может не входить в `players` вовсе (пул шире отслеживаемого ростера). Подробности формата и запросов — [`docs/csv-import.md`](./csv-import.md).
 
-**Замена целиком при каждом импорте**: `elixir_race_entries`, `formation_tiles`, `contribution_entries`, `player_stats`.
-**Исключение — накопительно по неделям**: `weekly_rating_entries` (импорт указывает `weekStart`, затрагивает только эту неделю).
+**Замена целиком при каждом импорте**: `elixir_race_entries`, `formation_tiles`.
+**Исключение — накопительно по неделям**: `contribution_entries` (импорт указывает `weekStart`, затрагивает только строки этой недели).
 
 ### `elixir_race_entries`
 
@@ -142,52 +184,31 @@ erDiagram
 | `x`, `y` | integer | Координаты на карте построения |
 | `nick` | text | |
 | `power` | integer, nullable | `null`, если не удалось разобрать со скриншота |
-| `role` | text (`FormationRole`: `attacker`\|`mixed`\|`defender`\|`none`) | |
 
-### `rating_weeks` + `weekly_rating_entries`
+Своего поля `role` больше нет (см. ADR 0005) — «Стиль игры» на формации читается живьём из `players.playstyle` по нику (фолбэк `'none'`, если ник не найден в ростере).
 
-Нормализовано на две таблицы, чтобы можно было импортировать по одной неделе за раз, не трогая остальные.
+### `contribution_entries` — «Вклад»
 
-**`rating_weeks`**
-
-| Колонка | Тип | Описание |
-|---|---|---|
-| `id` | text (nanoid) | PK |
-| `label` | text | Подпись недели (по умолчанию = `weekStart`) |
-| `weekStart` | text, **unique** | Дата начала недели, естественный ключ импорта |
-
-**`weekly_rating_entries`**
+См. CONTEXT.md «Вклад», ADR 0003. Одна строка = очки одного игрока за одну неделю. Заменяет прежние раздельные «рейтинг» и «вклад» — питает и вкладку «Рейтинг игроков» (история последних 5 недель, `contribution.history`), и «Анализ вклада» (только последняя неделя, `contribution.list`).
 
 | Колонка | Тип | Описание |
 |---|---|---|
 | `id` | text (nanoid) | PK |
-| `weekId` | text FK → `rating_weeks.id`, `ON DELETE CASCADE` | |
-| `nick` | text | |
-| `points` | integer | |
+| `nick` | text | Вместе с `weekStart` — уникальный индекс `contribution_entries_nick_week_idx` |
+| `weekStart` | text (`YYYY-MM-DD`) | Дата начала недели, естественный ключ накопления. Повторная заливка с тем же `weekStart` перезаписывает только эту неделю |
+| `points` | integer | Очки за эту неделю |
 
-При чтении (`weeklyRating.list`) берутся последние 5 записей `rating_weeks` (по `weekStart` desc), для каждого `nick` собирается массив очков по этим неделям, пропуски заполняются нулём.
+`group` здесь не хранится — это живой атрибут игрока (`players.group`), а не факт про прошлую неделю; на чтении джойнится по нику. `avgDuelScore`/`avgDuelRank` на странице профиля — не поля этой таблицы, а среднее по всей истории (см. ниже).
 
-### `contribution_entries`
+---
 
-| Колонка | Тип | Описание |
-|---|---|---|
-| `id` | text (nanoid) | PK |
-| `nick` | text | |
-| `group` | text (`PlayerGroup`) | Группа на момент импорта — может отличаться от текущей `players.group` |
-| `points` | integer | Очки рейтинга дуэлей альянса, суммарно |
+## Вычисляемые метрики профиля (не отдельная таблица)
 
-### `player_stats`
+Раньше `strongerThanPercent`, `weeklyPowerChangePercent`, `avgDuelScore`, `avgDuelRank` жили в отдельной таблице `player_stats` как ручной CSV-снапшот. Таблицы больше нет (см. ADR 0004) — все четыре величины считаются на лету в `profile.get`/`server/src/trpc/routers/profileStats.ts`, `null` вместо значения, если данных ещё недостаточно:
 
-Дуэльная статистика на странице профиля (`ProfileStats`, кроме `lastCoachmanDate` — та вычисляется из `caravan_runs`, не хранится отдельно). Добавлена по аналогии с остальными снапшотами, не обсуждалась явно.
-
-| Колонка | Тип | Описание |
-|---|---|---|
-| `id` | text (nanoid) | PK |
-| `nick` | text | |
-| `avgDuelScore` | integer | |
-| `avgDuelRank` | integer | |
-| `strongerThanPercent` | integer | |
-| `weeklyPowerChangePercent` | real | |
+- `strongerThanPercent` — доля игроков альянса (кроме себя и кроме тех, у кого мощь 0) с живой суммой `squads.powerM` меньше своей.
+- `weeklyPowerChangePercent` — изменение своей суммы `squads.powerM` между двумя последними `power_snapshots`.
+- `avgDuelScore` / `avgDuelRank` — среднее очков / среднего места по всей истории `contribution_entries` этого ника (место — позиция по убыванию очков среди участников той недели, недели без участия не считаются).
 
 ---
 

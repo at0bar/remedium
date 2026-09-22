@@ -22,7 +22,7 @@ export function Sidebar({ open, onNavigate }: { open?: boolean; onNavigate?: () 
       <div className="sb-brand">
         <div className="sb-tag">Alliance Dashboard</div>
         <div className="sb-title">Remedium</div>
-        <div className="sb-sub">// [Meow] Akatsukii</div>
+        <div className="sb-sub">// [IRON] ЦАРСТВО</div>
       </div>
       <div className="nav-grp">Разделы</div>
       {NAV_ITEMS.map((item) => (

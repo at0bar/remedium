@@ -145,11 +145,12 @@ export function useCreatePowerSnapshot() {
 
 /**
  * Fallbacks for the alliance-wide `settings` key-value store (see ADR 0006), used before
- * useSettings() has loaded and seeded via drizzle/0007 and 0008 so behavior doesn't regress
- * for an unmigrated DB.
+ * useSettings() has loaded and seeded via drizzle/0007-0010 so behavior doesn't regress for an
+ * unmigrated DB.
  */
 export const DEFAULT_ALLIANCE_NAME = '[IRON] ЦАРСТВО';
 export const DEFAULT_SERVER_NUMBER = '337';
+export const DEFAULT_REGION_NAME = 'Небесная крепость';
 export const DEFAULT_GROUP_THRESHOLD_R1_R2 = 8_000_000;
 export const DEFAULT_GROUP_THRESHOLD_R2_R3 = 30_000_000;
 

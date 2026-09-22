@@ -71,6 +71,13 @@
       "when": 1790105392771,
       "tag": "0009_wandering_sentry",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1790110927303,
+      "tag": "0010_seed_region_name",
+      "breakpoints": true
     }
   ]
 }

@@ -6,13 +6,14 @@ import { Button } from '../../../components/ui/Button';
 import { Callout } from '../../../components/ui/Callout';
 import { StatTile } from '../../../components/ui/StatTile';
 import { SquadBlock } from '../../../components/ui/SquadBlock';
-import { useAddSquad, useDeleteSquad, useProfile, useUpdateSquad } from '../../../lib/api/hooks';
+import { DEFAULT_REGION_NAME, useAddSquad, useDeleteSquad, useProfile, useSettings, useUpdateSquad } from '../../../lib/api/hooks';
 import { formatDate, formatPercentChange, formatPowerM, sumPowerM } from '../../../lib/format';
 import { PLAYSTYLE_LABELS } from '../../../lib/playstyle';
 import { SquadEditForm } from './SquadEditForm';
 
 export function OverviewTab() {
   const { data: profile, isLoading } = useProfile();
+  const { data: settings } = useSettings();
   const addSquad = useAddSquad();
   const updateSquad = useUpdateSquad();
   const deleteSquad = useDeleteSquad();
@@ -61,7 +62,11 @@ export function OverviewTab() {
           }
         />
         <StatTile value={PLAYSTYLE_LABELS[profile.playstyle]} label="Стиль игры" />
-        <StatTile value={`${profile.coords.x}:${profile.coords.y}`} label="Координаты" sub={`Мифриловый зал`} />
+        <StatTile
+          value={`${profile.coords.x}:${profile.coords.y}`}
+          label="Координаты"
+          sub={settings?.regionName ?? DEFAULT_REGION_NAME}
+        />
       </div>
 
       <div className="blabel">Отряды ({profile.squads.length}/4) · суммарная мощь {formatPowerM(totalPower)}</div>

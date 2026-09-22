@@ -9,7 +9,7 @@ import { players } from '../db/schema.js';
  * Run this once against a fresh deployment (e.g. `docker exec <container> node dist/scripts/seedPlayer.js ...`)
  * to create the roster row for whoever BOOTSTRAP_ADMIN_NICK points at, then register normally.
  *
- * Usage: node dist/scripts/seedPlayer.js --nick Atobar --level 25 --group R3 --playstyle Фарм --power 0
+ * Usage: node dist/scripts/seedPlayer.js --nick Atobar --level 25 --group R3 --playstyle attacker --power 0
  */
 function readArg(flag: string): string | undefined {
   const idx = process.argv.indexOf(flag);
@@ -21,19 +21,19 @@ const input = z
     nick: z.string().trim().min(1),
     level: z.coerce.number().int().positive(),
     group: z.enum(['R1', 'R2', 'R3', 'R4', 'R5']),
-    playstyle: z.enum(['Фарм', 'Оборона', 'Смешанный']),
+    playstyle: z.enum(['attacker', 'defender', 'mixed', 'none']),
     totalPowerM: z.coerce.number().nonnegative(),
   })
   .safeParse({
     nick: readArg('--nick'),
     level: readArg('--level') ?? '1',
     group: readArg('--group') ?? 'R1',
-    playstyle: readArg('--playstyle') ?? 'Фарм',
+    playstyle: readArg('--playstyle') ?? 'none',
     totalPowerM: readArg('--power') ?? '0',
   });
 
 if (!input.success) {
-  console.error('Usage: seedPlayer --nick <nick> [--level N] [--group R1..R5] [--playstyle Фарм|Оборона|Смешанный] [--power N]');
+  console.error('Usage: seedPlayer --nick <nick> [--level N] [--group R1..R5] [--playstyle attacker|defender|mixed|none] [--power N]');
   console.error(input.error.issues);
   process.exit(1);
 }

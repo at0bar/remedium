@@ -3,10 +3,10 @@ import { CancelIcon, SaveIcon } from '../../../components/ui/ActionIcons';
 import { Button } from '../../../components/ui/Button';
 import { useAuth } from '../../auth/AuthContext';
 import { formatPowerM } from '../../../lib/format';
+import { PLAYSTYLES, PLAYSTYLE_LABELS } from '../../../lib/playstyle';
 import type { AlliancePlayer, PlayerGroup, Playstyle } from '../../../lib/api/types';
 
 const GROUPS: PlayerGroup[] = ['R1', 'R2', 'R3', 'R4', 'R5'];
-const PLAYSTYLES: Playstyle[] = ['Фарм', 'Оборона', 'Смешанный'];
 
 export function PlayerEditRow({
   initial,
@@ -24,7 +24,7 @@ export function PlayerEditRow({
   const [level, setLevel] = useState(initial?.level ?? 1);
   const [group, setGroup] = useState<PlayerGroup>(initial?.group ?? 'R1');
   const [totalPowerM, setTotalPowerM] = useState(initial?.totalPowerM ?? 0);
-  const [playstyle, setPlaystyle] = useState<Playstyle>(initial?.playstyle ?? 'Фарм');
+  const [playstyle, setPlaystyle] = useState<Playstyle>(initial?.playstyle ?? 'none');
 
   return (
     <tr>
@@ -81,7 +81,7 @@ export function PlayerEditRow({
         <select className="auth-input" value={playstyle} onChange={(e) => setPlaystyle(e.target.value as Playstyle)}>
           {PLAYSTYLES.map((p) => (
             <option key={p} value={p}>
-              {p}
+              {PLAYSTYLE_LABELS[p]}
             </option>
           ))}
         </select>

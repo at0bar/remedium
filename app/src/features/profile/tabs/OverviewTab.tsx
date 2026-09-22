@@ -8,6 +8,7 @@ import { StatTile } from '../../../components/ui/StatTile';
 import { SquadBlock } from '../../../components/ui/SquadBlock';
 import { useAddSquad, useDeleteSquad, useProfile, useUpdateSquad } from '../../../lib/api/hooks';
 import { formatDate, formatPercentChange, formatPowerM, sumPowerM } from '../../../lib/format';
+import { PLAYSTYLE_LABELS } from '../../../lib/playstyle';
 import { SquadEditForm } from './SquadEditForm';
 
 export function OverviewTab() {
@@ -26,20 +27,22 @@ export function OverviewTab() {
 
   return (
     <>
-      <Callout kind="tip">
-        <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', gap: 12, flexWrap: 'wrap' }}>
-          <span>
-            Ты <b>мощнее чем {profile.stats.strongerThanPercent}%</b> игроков альянса — входишь в топ по суммарной мощи
-            отрядов.
+      {profile.stats.strongerThanPercent !== null && profile.stats.strongerThanPercent > 50 && (
+        <Callout kind="tip">
+          <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', gap: 12, flexWrap: 'wrap' }}>
+            <span>
+              Ты <b>мощнее чем {profile.stats.strongerThanPercent}%</b> игроков альянса — входишь в топ по суммарной мощи
+              отрядов.
+            </span>
+            <Link
+              to="/stats/rating"
+              style={{ color: 'var(--gold-lt)', fontFamily: 'var(--mono)', fontSize: 12, whiteSpace: 'nowrap', textDecoration: 'none' }}
+            >
+              Смотреть рейтинг →
+            </Link>
           </span>
-          <Link
-            to="/stats/rating"
-            style={{ color: 'var(--gold-lt)', fontFamily: 'var(--mono)', fontSize: 12, whiteSpace: 'nowrap', textDecoration: 'none' }}
-          >
-            Смотреть рейтинг →
-          </Link>
-        </span>
-      </Callout>
+        </Callout>
+      )}
 
       <div className="g-auto">
         <StatTile value={String(profile.level)} label="Уровень" sub={`Ранг ${profile.group}`} />
@@ -47,9 +50,17 @@ export function OverviewTab() {
           value={formatPowerM(totalPower)}
           label="Суммарная мощь"
           sub={`${formatPercentChange(profile.stats.weeklyPowerChangePercent)} за неделю`}
-          subTone="positive"
+          subTone={
+            profile.stats.weeklyPowerChangePercent === null
+              ? 'muted'
+              : profile.stats.weeklyPowerChangePercent > 0
+                ? 'positive'
+                : profile.stats.weeklyPowerChangePercent < 0
+                  ? 'negative'
+                  : 'muted'
+          }
         />
-        <StatTile value={profile.playstyle} label="Стиль игры" />
+        <StatTile value={PLAYSTYLE_LABELS[profile.playstyle]} label="Стиль игры" />
         <StatTile value={`${profile.coords.x}:${profile.coords.y}`} label="Координаты" sub={`Мифриловый зал`} />
       </div>
 
@@ -115,9 +126,12 @@ export function OverviewTab() {
 
       <div className="blabel">Краткая статистика</div>
       <div className="g-auto">
-        <StatTile value={profile.stats.avgDuelScore.toLocaleString('ru-RU')} label="Ср. очки дуэли альянсов" />
-        <StatTile value={`#${profile.stats.avgDuelRank}`} label="Ср. место в рейтинге дуэли" />
-        <StatTile value={formatDate(profile.stats.lastCoachmanDate)} label="Последний раз кучером" />
+        <StatTile
+          value={profile.stats.avgDuelScore === null ? '—' : profile.stats.avgDuelScore.toLocaleString('ru-RU')}
+          label="Ср. очки дуэли альянсов"
+        />
+        <StatTile value={profile.stats.avgDuelRank === null ? '—' : `#${profile.stats.avgDuelRank}`} label="Ср. место в рейтинге дуэли" />
+        <StatTile value={formatDate(profile.stats.lastCoachmanDate)} label="Последний раз был назначен в караван" />
       </div>
     </>
   );

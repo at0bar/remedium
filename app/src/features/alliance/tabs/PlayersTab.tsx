@@ -6,6 +6,7 @@ import { TableWrap } from '../../../components/ui/TableWrap';
 import { useAuth } from '../../auth/AuthContext';
 import { useAddPlayer, useAlliancePlayers, useDeletePlayer, useUpdatePlayer } from '../../../lib/api/hooks';
 import { formatPowerM } from '../../../lib/format';
+import { PLAYSTYLE_LABELS } from '../../../lib/playstyle';
 import type { AlliancePlayer, PlayerGroup } from '../../../lib/api/types';
 import { PlayerEditRow } from './PlayerEditRow';
 
@@ -111,7 +112,7 @@ export function PlayersTab() {
                     <Badge variant={GROUP_BADGE_VARIANT[player.group]}>{player.group}</Badge>
                   </td>
                   <td>{formatPowerM(player.totalPowerM)}</td>
-                  <td>{player.playstyle}</td>
+                  <td>{PLAYSTYLE_LABELS[player.playstyle]}</td>
                   <td className="tbl-actions">
                     <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                       {(canEdit || player.isSelf) && (

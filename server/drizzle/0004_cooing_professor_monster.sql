@@ -1,0 +1,1 @@
+ALTER TABLE `formation_tiles` DROP COLUMN `role`;

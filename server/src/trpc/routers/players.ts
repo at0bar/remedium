@@ -7,20 +7,25 @@ import { players, squads } from '../../db/schema.js';
 import { editorProcedure, protectedProcedure, router } from '../trpc.js';
 
 const PLAYER_GROUPS = ['R1', 'R2', 'R3', 'R4', 'R5'] as const;
-const PLAYSTYLES = ['Фарм', 'Оборона', 'Смешанный'] as const;
+const PLAYSTYLES = ['attacker', 'defender', 'mixed', 'none'] as const;
 
-async function sumOwnSquads(playerId: string): Promise<number> {
-  const [row] = await db
-    .select({ total: sql<number>`coalesce(sum(${squads.powerM}), 0)` })
+/**
+ * Live squad power per player, summed across all their squads — reused wherever a real (not
+ * manually-entered) power figure is needed: here for the caller's own roster row, and in
+ * `profileStats.ts`/`powerSnapshot.ts` for alliance-wide comparisons and snapshots.
+ */
+export async function sumPowerByPlayer(): Promise<Map<string, number>> {
+  const rows = await db
+    .select({ playerId: squads.playerId, total: sql<number>`coalesce(sum(${squads.powerM}), 0)` })
     .from(squads)
-    .where(eq(squads.playerId, playerId));
-  return row?.total ?? 0;
+    .groupBy(squads.playerId);
+  return new Map(rows.map((r) => [r.playerId, r.total]));
 }
 
 /** Every row keeps its manually-entered totalPowerM, except the caller's own — see schema.ts. */
 async function listPlayersWithPower(selfPlayerId: string | undefined) {
   const rows = await db.select().from(players);
-  const selfPower = selfPlayerId ? await sumOwnSquads(selfPlayerId) : 0;
+  const selfPower = selfPlayerId ? (await sumPowerByPlayer()).get(selfPlayerId) ?? 0 : 0;
   return rows.map((row) => ({
     id: row.id,
     nick: row.nick,

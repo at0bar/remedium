@@ -133,5 +133,23 @@ export function useContribution() {
 }
 
 export function useWeeklyRating() {
-  return trpc.weeklyRating.list.useQuery();
+  return trpc.contribution.history.useQuery();
+}
+
+export function useCreatePowerSnapshot() {
+  const utils = trpc.useUtils();
+  return trpc.powerSnapshot.create.useMutation({
+    onSuccess: () => utils.profile.get.invalidate(),
+  });
+}
+
+export function useSettings() {
+  return trpc.settings.get.useQuery();
+}
+
+export function useUpdateSetting() {
+  const utils = trpc.useUtils();
+  return trpc.settings.update.useMutation({
+    onSuccess: (settings) => utils.settings.get.setData(undefined, settings),
+  });
 }

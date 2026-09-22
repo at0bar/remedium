@@ -2,8 +2,9 @@ import { TRPCError } from '@trpc/server';
 import { desc, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../db/client.js';
-import { caravanRuns, playerStats, players, squads } from '../../db/schema.js';
+import { caravanRuns, players, squads } from '../../db/schema.js';
 import { protectedProcedure, router } from '../trpc.js';
+import { duelStats, strongerThanPercent, weeklyPowerChangePercent } from './profileStats.js';
 
 export const profileRouter = router({
   get: protectedProcedure.query(async ({ ctx }) => {
@@ -11,13 +12,18 @@ export const profileRouter = router({
     if (!player) throw new TRPCError({ code: 'NOT_FOUND' });
 
     const mySquads = await db.select().from(squads).where(eq(squads.playerId, ctx.user.playerId));
-    const [stats] = await db.select().from(playerStats).where(eq(playerStats.nick, player.nick)).limit(1);
     const [lastRun] = await db
       .select({ date: caravanRuns.lastAssignedDate })
       .from(caravanRuns)
       .where(eq(caravanRuns.coachmanPlayerId, ctx.user.playerId))
       .orderBy(desc(caravanRuns.lastAssignedDate))
       .limit(1);
+
+    const [stronger, weeklyChange, duel] = await Promise.all([
+      strongerThanPercent(ctx.user.playerId),
+      weeklyPowerChangePercent(ctx.user.playerId),
+      duelStats(player.nick),
+    ]);
 
     return {
       nick: player.nick,
@@ -27,11 +33,11 @@ export const profileRouter = router({
       coords: { x: player.coordsX ?? 0, y: player.coordsY ?? 0 },
       squads: mySquads,
       stats: {
-        avgDuelScore: stats?.avgDuelScore ?? 0,
-        avgDuelRank: stats?.avgDuelRank ?? 0,
-        strongerThanPercent: stats?.strongerThanPercent ?? 0,
-        lastCoachmanDate: lastRun?.date ?? '',
-        weeklyPowerChangePercent: stats?.weeklyPowerChangePercent ?? 0,
+        avgDuelScore: duel.avgDuelScore,
+        avgDuelRank: duel.avgDuelRank,
+        strongerThanPercent: stronger,
+        lastCoachmanDate: lastRun?.date ?? null,
+        weeklyPowerChangePercent: weeklyChange,
       },
     };
   }),

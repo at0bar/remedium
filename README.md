@@ -1,6 +1,6 @@
 # last-asylum-alliance-manager
 
-Remedium — дашборд альянса **[Meow] Akatsukii**. Фронт (`app/`) — React SPA; бэкенд (`server/`) — Fastify + tRPC + SQLite. Домен и принятые решения см. в [CONTEXT.md](./CONTEXT.md) и [docs/adr/](./docs/adr/), структуру БД — в [docs/database.md](./docs/database.md), формат заливки CSV — в [docs/csv-import.md](./docs/csv-import.md).
+Remedium — дашборд альянса **[IRON] ЦАРСТВО**. Фронт (`app/`) — React SPA; бэкенд (`server/`) — Fastify + tRPC + SQLite. Домен и принятые решения см. в [CONTEXT.md](./CONTEXT.md) и [docs/adr/](./docs/adr/), структуру БД — в [docs/database.md](./docs/database.md), формат заливки CSV — в [docs/csv-import.md](./docs/csv-import.md).
 
 ## Разработка
 

@@ -1,9 +1,11 @@
 import { Fragment, useMemo } from 'react';
 import { Badge, GROUP_BADGE_VARIANT } from '../../../components/ui/Badge';
-import { useContribution, useSettings } from '../../../lib/api/hooks';
-
-const DEFAULT_R1_R2_THRESHOLD = 8_000_000;
-const DEFAULT_R2_R3_THRESHOLD = 30_000_000;
+import {
+  DEFAULT_GROUP_THRESHOLD_R1_R2,
+  DEFAULT_GROUP_THRESHOLD_R2_R3,
+  useContribution,
+  useSettings,
+} from '../../../lib/api/hooks';
 
 const PX_PER_MILLION = 12;
 const MINOR_STEP = 1_000_000;
@@ -67,8 +69,8 @@ export function ContributionScale() {
 
   const milestones = useMemo(
     () => [
-      { value: Number(settings?.groupThresholdR2R3 ?? DEFAULT_R2_R3_THRESHOLD), label: 'R3', color: 'var(--blue)' },
-      { value: Number(settings?.groupThresholdR1R2 ?? DEFAULT_R1_R2_THRESHOLD), label: 'R2', color: 'var(--teal)' },
+      { value: Number(settings?.groupThresholdR2R3 ?? DEFAULT_GROUP_THRESHOLD_R2_R3), label: 'R3', color: 'var(--blue)' },
+      { value: Number(settings?.groupThresholdR1R2 ?? DEFAULT_GROUP_THRESHOLD_R1_R2), label: 'R2', color: 'var(--teal)' },
       { value: 0, label: 'R1' },
     ],
     [settings],

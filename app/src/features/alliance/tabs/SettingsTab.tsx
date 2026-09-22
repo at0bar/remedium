@@ -36,7 +36,7 @@ export function SettingsTab() {
   return (
     <>
       <Card style={{ marginBottom: 20 }}>
-        <CardTitle>Альянс и сервер</CardTitle>
+        <CardTitle className="ctitle-divider">Альянс и сервер</CardTitle>
         <p style={{ color: 'var(--text2)', fontSize: 13, margin: '0 0 12px' }}>
           Название альянса, номер сервера и название региона, отображаемые в шапках разделов, боковом меню, профиле и
           формации.
@@ -114,7 +114,7 @@ export function SettingsTab() {
           </div>
         </div>
 
-        <CardTitle>Пороги групп</CardTitle>
+        <CardTitle className="ctitle-divider">Пороги групп</CardTitle>
         <p style={{ color: 'var(--text2)', fontSize: 13, margin: '0 0 12px' }}>
           Ориентировочные пороги очков Вклада для линий R1/R2/R3 на шкале «Анализ вклада». Группу игрока это не меняет
           — её по-прежнему назначает редактор вручную.

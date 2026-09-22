@@ -38,6 +38,9 @@ export interface AlliancePlayer {
   group: PlayerGroup;
   totalPowerM: number;
   playstyle: Playstyle;
+  /** Base position on the world map — officer-edited, also what "Формация" plots (see ADR 0007). */
+  coordsX: number | null;
+  coordsY: number | null;
   isSelf?: boolean;
 }
 
@@ -79,8 +82,8 @@ export interface FormationTile {
   x: number;
   y: number;
   nick: string;
-  /** Raw power value as shown on the source screenshot — unit wasn't labeled there, kept as-is. */
-  power: number | null;
+  /** The player's totalPowerM, in millions — same figure as the "Игроки" tab (see ADR 0007). */
+  power: number;
   /** Joined live from the player's `playstyle` — not its own stored field, see ADR 0005. */
   role: Playstyle;
   isSelf?: boolean;

@@ -4,10 +4,9 @@ import type { FastifyInstance } from 'fastify';
 import { nanoid } from 'nanoid';
 import { z } from 'zod';
 import { db } from '../db/client.js';
-import { contributionEntries, elixirRaceEntries, formationTiles } from '../db/schema.js';
+import { contributionEntries, elixirRaceEntries } from '../db/schema.js';
 
 const numeric = z.coerce.number();
-const nullableNumeric = z.preprocess((v) => (v === '' || v === undefined ? null : v), z.coerce.number().nullable());
 
 const ROW_SCHEMAS = {
   'elixir-race': z.object({
@@ -16,33 +15,23 @@ const ROW_SCHEMAS = {
     team: z.enum(['Основа А', 'Основа Б', 'Резерв А', 'Резерв Б', 'Не зарегистрирован']),
     participation: z.enum(['Да', 'Нет', 'Не знает']),
   }),
-  formation: z.object({
-    x: numeric,
-    y: numeric,
-    nick: z.string().min(1),
-    power: nullableNumeric,
-  }),
   contribution: z.object({ nick: z.string().min(1), points: numeric }),
 } as const;
 
 /**
  * CSV bulk-import for the read-only snapshot resources — see CONTEXT.md "Импортируемые
- * данные". `elixir-race` and `formation` wholesale-replace their table on each import;
- * `contribution` ("Вклад", see CONTEXT.md / ADR 0003) instead replaces only the rows for the
- * one week being imported, since it's a trailing-weeks history. Every row is validated against
- * ROW_SCHEMAS before anything is written — a malformed CSV fails the whole import, not just a
- * few rows.
+ * данные". `elixir-race` wholesale-replaces its table on each import; `contribution` ("Вклад",
+ * see CONTEXT.md / ADR 0003) instead replaces only the rows for the one week being imported,
+ * since it's a trailing-weeks history. Every row is validated against ROW_SCHEMAS before
+ * anything is written — a malformed CSV fails the whole import, not just a few rows.
+ * (Formation used to be a third CSV resource here — see ADR 0007 for why it now reads live off
+ * `players.coords_x/y` instead.)
  */
 const REPLACE_ALL_IMPORTERS: Record<string, (rows: Record<string, unknown>[]) => Promise<void>> = {
   'elixir-race': async (rows) => {
     const parsed = rows as z.infer<(typeof ROW_SCHEMAS)['elixir-race']>[];
     await db.delete(elixirRaceEntries);
     if (parsed.length) await db.insert(elixirRaceEntries).values(parsed.map((r) => ({ id: nanoid(), ...r })));
-  },
-  formation: async (rows) => {
-    const parsed = rows as z.infer<(typeof ROW_SCHEMAS)['formation']>[];
-    await db.delete(formationTiles);
-    if (parsed.length) await db.insert(formationTiles).values(parsed.map((r) => ({ id: nanoid(), ...r })));
   },
 };
 

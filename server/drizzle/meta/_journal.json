@@ -64,6 +64,13 @@
       "when": 1790096001771,
       "tag": "0008_seed_alliance_config",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1790105392771,
+      "tag": "0009_wandering_sentry",
+      "breakpoints": true
     }
   ]
 }

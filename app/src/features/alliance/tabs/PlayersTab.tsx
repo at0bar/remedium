@@ -74,12 +74,13 @@ export function PlayersTab() {
       <TableWrap>
         <table className="tbl-fixed">
           <colgroup>
-            <col style={{ width: '34%' }} />
-            <col style={{ width: '10%' }} />
-            <col style={{ width: '10%' }} />
+            <col style={{ width: '26%' }} />
+            <col style={{ width: '8%' }} />
+            <col style={{ width: '8%' }} />
+            <col style={{ width: '14%' }} />
             <col style={{ width: '16%' }} />
-            <col style={{ width: '18%' }} />
-            <col style={{ width: '12%' }} />
+            <col style={{ width: '14%' }} />
+            <col style={{ width: '14%' }} />
           </colgroup>
           <thead>
             <tr>
@@ -88,6 +89,7 @@ export function PlayersTab() {
               <th>Группа</th>
               <th>Суммарная мощь</th>
               <th>Стиль игры</th>
+              <th>Координаты</th>
               <th className="tbl-actions">Действия</th>
             </tr>
           </thead>
@@ -113,6 +115,7 @@ export function PlayersTab() {
                   </td>
                   <td>{formatPowerM(player.totalPowerM)}</td>
                   <td>{PLAYSTYLE_LABELS[player.playstyle]}</td>
+                  <td>{player.coordsX != null && player.coordsY != null ? `${player.coordsX}:${player.coordsY}` : '—'}</td>
                   <td className="tbl-actions">
                     <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                       {(canEdit || player.isSelf) && (

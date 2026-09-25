@@ -18,6 +18,8 @@ export type ElixirParticipation = 'Да' | 'Нет' | 'Не знает';
  * behind them, so there's no real squad data to sum) — EXCEPT for whichever row is the
  * current caller's own, where it's always overridden with a live sum of their own `squads`
  * (see `listPlayersWithPower` in routers/players.ts). Mirrors the original mock's `withSelfPower`.
+ * `coordsX`/`coordsY` — base position on the world map; officer-edited from the "Игроки" tab
+ * (see ADR 0007). This is also what "Формация" plots, filtering out rows with no coords set.
  */
 export const players = sqliteTable('players', {
   id: text('id').primaryKey(),
@@ -68,8 +70,9 @@ export const caravanRuns = sqliteTable('caravan_runs', {
 });
 
 /**
- * `elixirRaceEntries` and `formationTiles` are CSV-imported snapshots (see CONTEXT.md
- * "Импортируемые данные") — no app CRUD yet, wholesale-replaced on every officer import.
+ * `elixirRaceEntries` is a CSV-imported snapshot (see CONTEXT.md "Импортируемые данные") — no
+ * app CRUD yet, wholesale-replaced on every officer import. (Formation used to be a second such
+ * table, `formationTiles` — see ADR 0007 for why it was dropped in favor of `players.coords_x/y`.)
  */
 export const elixirRaceEntries = sqliteTable('elixir_race_entries', {
   id: text('id').primaryKey(),
@@ -77,16 +80,6 @@ export const elixirRaceEntries = sqliteTable('elixir_race_entries', {
   level: integer('level').notNull(),
   team: text('team').notNull().$type<ElixirTeam>(),
   participation: text('participation').notNull().$type<ElixirParticipation>(),
-});
-
-/** `role` isn't stored here — it's the same "Стиль игры" as `players.playstyle` (see ADR 0005),
- * joined live by nick when formation tiles are read. */
-export const formationTiles = sqliteTable('formation_tiles', {
-  id: text('id').primaryKey(),
-  x: integer('x').notNull(),
-  y: integer('y').notNull(),
-  nick: text('nick').notNull(),
-  power: integer('power'),
 });
 
 /**

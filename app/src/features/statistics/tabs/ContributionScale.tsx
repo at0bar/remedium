@@ -1,9 +1,11 @@
 import { Fragment, useMemo } from 'react';
 import { Badge, GROUP_BADGE_VARIANT } from '../../../components/ui/Badge';
-import { useContribution, useSettings } from '../../../lib/api/hooks';
-
-const DEFAULT_R1_R2_THRESHOLD = 8_000_000;
-const DEFAULT_R2_R3_THRESHOLD = 30_000_000;
+import {
+  DEFAULT_GROUP_THRESHOLD_R1_R2,
+  DEFAULT_GROUP_THRESHOLD_R2_R3,
+  useContribution,
+  useSettings,
+} from '../../../lib/api/hooks';
 
 const PX_PER_MILLION = 12;
 const MINOR_STEP = 1_000_000;
@@ -67,18 +69,19 @@ export function ContributionScale() {
 
   const milestones = useMemo(
     () => [
-      { value: Number(settings?.groupThresholdR2R3 ?? DEFAULT_R2_R3_THRESHOLD), label: 'R3', color: 'var(--blue)' },
-      { value: Number(settings?.groupThresholdR1R2 ?? DEFAULT_R1_R2_THRESHOLD), label: 'R2', color: 'var(--teal)' },
+      { value: Number(settings?.groupThresholdR2R3 ?? DEFAULT_GROUP_THRESHOLD_R2_R3), label: 'R3', color: 'var(--blue)' },
+      { value: Number(settings?.groupThresholdR1R2 ?? DEFAULT_GROUP_THRESHOLD_R1_R2), label: 'R2', color: 'var(--teal)' },
       { value: 0, label: 'R1' },
     ],
     [settings],
   );
 
   const layout = useMemo(() => {
-    if (!entries || entries.length === 0) return null;
-
-    const maxPoints = Math.max(...entries.map((e) => e.points));
-    const maxRounded = Math.ceil(maxPoints / MAJOR_STEP) * MAJOR_STEP;
+    const rows_ = entries ?? [];
+    // The scale must stay meaningful even with no entries yet — always covers at least the
+    // R2/R3 milestone lines, never collapses to a zero-height ruler.
+    const maxPoints = Math.max(0, milestones[0]?.value ?? 0, ...rows_.map((e) => e.points));
+    const maxRounded = Math.max(MAJOR_STEP, Math.ceil(maxPoints / MAJOR_STEP) * MAJOR_STEP);
     const scaleH = (maxRounded / 1_000_000) * PX_PER_MILLION;
 
     // Fixed unit->px ratio (like the Formation grid's CELL) — the axis is true to scale.
@@ -91,16 +94,16 @@ export function ContributionScale() {
 
     // Rows are placed at their true scale position, then decluttered where crowded
     // — a thin leader line keeps each row's true value visible on the ruler.
-    const sortedDesc = [...entries].sort((a, b) => b.points - a.points);
+    const sortedDesc = [...rows_].sort((a, b) => b.points - a.points);
     const naiveYs = sortedDesc.map((entry) => y(entry.points));
     const displayYs = declutter(naiveYs, ROW_MIN_GAP);
     const rows = sortedDesc.map((entry, i) => ({ entry, naiveY: naiveYs[i], displayY: displayYs[i] }));
 
     const plotH = Math.max(scaleH, displayYs[displayYs.length - 1] ?? 0);
     return { ticks, rows, y, plotH };
-  }, [entries]);
+  }, [entries, milestones]);
 
-  if (isLoading || !entries || !layout) {
+  if (isLoading || !entries) {
     return <p style={{ color: 'var(--text2)', fontSize: 13 }}>Загрузка анализа вклада…</p>;
   }
 

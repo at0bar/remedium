@@ -27,9 +27,17 @@ export function Card({ accent, className, style, children }: CardProps) {
   );
 }
 
-export function CardTitle({ children, style }: { children: ReactNode; style?: CSSProperties }) {
+export function CardTitle({
+  children,
+  className,
+  style,
+}: {
+  children: ReactNode;
+  className?: string;
+  style?: CSSProperties;
+}) {
   return (
-    <div className="ctitle" style={style}>
+    <div className={['ctitle', className].filter(Boolean).join(' ')} style={style}>
       {children}
     </div>
   );

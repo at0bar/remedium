@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useFormation } from '../../../lib/api/hooks';
+import { DEFAULT_REGION_NAME, useFormation, useSettings } from '../../../lib/api/hooks';
 
 const CELL = 20; // px per in-game coordinate unit
 const CITY_CELLS = 3; // a city occupies 3x3 units
@@ -17,6 +17,8 @@ const MARGIN_BOTTOM = 48;
 
 export function CoordinateFormationGrid() {
   const { data: formationTiles, isLoading } = useFormation();
+  const { data: settings } = useSettings();
+  const regionName = settings?.regionName ?? DEFAULT_REGION_NAME;
 
   const layout = useMemo(() => {
     if (!formationTiles) return null;
@@ -61,7 +63,7 @@ export function CoordinateFormationGrid() {
       <div className="region-line h region-us" style={{ top: 25, left: 23, width: 148 }} />
       <div className="region-line v region-us" style={{ top: 25, left: 23, height: 74 }} />
       <span className="region-label" style={{ top: 31, left: 33, color: 'var(--gold-lt)' }}>
-        Мифриловый зал
+        {regionName}
       </span>
 
       <div

@@ -22,8 +22,12 @@ export async function sumPowerByPlayer(): Promise<Map<string, number>> {
   return new Map(rows.map((r) => [r.playerId, r.total]));
 }
 
-/** Every row keeps its manually-entered totalPowerM, except the caller's own — see schema.ts. */
-async function listPlayersWithPower(selfPlayerId: string | undefined) {
+/**
+ * Every row keeps its manually-entered totalPowerM, except the caller's own — see schema.ts.
+ * Also the source "Формация" reads from (see ADR 0007) — coordsX/coordsY are included here so
+ * both the Players tab and the Formation tab share one query.
+ */
+export async function listPlayersWithPower(selfPlayerId: string | undefined) {
   const rows = await db.select().from(players);
   const selfPower = selfPlayerId ? (await sumPowerByPlayer()).get(selfPlayerId) ?? 0 : 0;
   return rows.map((row) => ({
@@ -33,6 +37,8 @@ async function listPlayersWithPower(selfPlayerId: string | undefined) {
     group: row.group,
     playstyle: row.playstyle,
     totalPowerM: row.id === selfPlayerId ? selfPower : row.totalPowerM,
+    coordsX: row.coordsX,
+    coordsY: row.coordsY,
     isSelf: row.id === selfPlayerId || undefined,
   }));
 }
@@ -48,6 +54,8 @@ export const playersRouter = router({
         group: z.enum(PLAYER_GROUPS),
         totalPowerM: z.number().nonnegative(),
         playstyle: z.enum(PLAYSTYLES),
+        coordsX: z.number().int().nullable().optional(),
+        coordsY: z.number().int().nullable().optional(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -63,8 +71,8 @@ export const playersRouter = router({
         group: z.enum(PLAYER_GROUPS).optional(),
         totalPowerM: z.number().nonnegative().optional(),
         playstyle: z.enum(PLAYSTYLES).optional(),
-        coordsX: z.number().int().optional(),
-        coordsY: z.number().int().optional(),
+        coordsX: z.number().int().nullable().optional(),
+        coordsY: z.number().int().nullable().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -73,10 +81,16 @@ export const playersRouter = router({
 
       const [current] = await db.select().from(players).where(eq(players.id, input.id)).limit(1);
       if (!current) throw new TRPCError({ code: 'NOT_FOUND' });
-      // Compared against the stored value, not just "was a group sent" — the client always
-      // resends every field on save, so a same-value group must not require the edit flag.
+      // Compared against the stored value, not just "was a field sent" — the client always
+      // resends every field on save, so a same-value group/coords must not require the edit flag.
       if (input.group !== undefined && input.group !== current.group && !ctx.user.canEdit) {
         throw new TRPCError({ code: 'FORBIDDEN', message: 'Смену группы может подтвердить только редактор.' });
+      }
+      const coordsChanged =
+        (input.coordsX !== undefined && input.coordsX !== current.coordsX) ||
+        (input.coordsY !== undefined && input.coordsY !== current.coordsY);
+      if (coordsChanged && !ctx.user.canEdit) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Координаты может менять только редактор.' });
       }
 
       const { id, ...fields } = input;

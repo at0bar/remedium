@@ -57,6 +57,27 @@
       "when": 1790021822937,
       "tag": "0007_seed_default_group_thresholds",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1790096001771,
+      "tag": "0008_seed_alliance_config",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1790105392771,
+      "tag": "0009_wandering_sentry",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1790110927303,
+      "tag": "0010_seed_region_name",
+      "breakpoints": true
     }
   ]
 }

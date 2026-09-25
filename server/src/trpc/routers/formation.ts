@@ -1,18 +1,23 @@
-import { db } from '../../db/client.js';
-import { formationTiles, players } from '../../db/schema.js';
 import { protectedProcedure, router } from '../trpc.js';
+import { listPlayersWithPower } from './players.js';
 
 export const formationRouter = router({
-  /** `role` isn't stored — it's "Стиль игры" (see ADR 0005), joined live from `players.playstyle`
-   * by nick, falling back to 'none' for a nick with no roster match. */
+  /**
+   * Reads live off the roster (see ADR 0007) — coordsX/coordsY, officer-edited from the
+   * "Игроки" tab, instead of the old CSV-imported `formation_tiles` snapshot. Players with no
+   * coords set yet are left off the map entirely rather than plotted at a fake origin.
+   */
   list: protectedProcedure.query(async ({ ctx }) => {
-    const rows = await db.select().from(formationTiles);
-    const rosterPlaystyles = new Map((await db.select({ nick: players.nick, playstyle: players.playstyle }).from(players)).map((p) => [p.nick, p.playstyle]));
-
-    return rows.map((r) => ({
-      ...r,
-      role: rosterPlaystyles.get(r.nick) ?? 'none',
-      isSelf: r.nick === ctx.user.nick || undefined,
-    }));
+    const roster = await listPlayersWithPower(ctx.user.playerId);
+    return roster
+      .filter((p): p is typeof p & { coordsX: number; coordsY: number } => p.coordsX !== null && p.coordsY !== null)
+      .map((p) => ({
+        x: p.coordsX,
+        y: p.coordsY,
+        nick: p.nick,
+        power: p.totalPowerM,
+        role: p.playstyle,
+        isSelf: p.isSelf,
+      }));
   }),
 });

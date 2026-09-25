@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { SectionHeader } from '../../components/layout/SectionHeader';
 import { TabBar } from '../../components/layout/TabBar';
+import { DEFAULT_SERVER_NUMBER, useSettings } from '../../lib/api/hooks';
 import { AlliancesTab } from './tabs/AlliancesTab';
 import { GeneralInfoTab } from './tabs/GeneralInfoTab';
 import { MapTab } from './tabs/MapTab';
@@ -14,9 +15,12 @@ const TABS = [
 ];
 
 export function ServerPage() {
+  const { data: settings } = useSettings();
+  const serverNumber = settings?.serverNumber ?? DEFAULT_SERVER_NUMBER;
+
   return (
     <section className="section">
-      <SectionHeader num="03 // СЕРВЕР" title="337" sub="Общая информация, правила и союзы сервера" />
+      <SectionHeader num="03 // СЕРВЕР" title={serverNumber} sub="Общая информация, правила и союзы сервера" />
       <TabBar tabs={TABS} />
       <Routes>
         <Route index element={<Navigate to="info" replace />} />

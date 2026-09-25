@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../features/auth/AuthContext';
-import { useProfile } from '../../lib/api/hooks';
+import { DEFAULT_ALLIANCE_NAME, useProfile, useSettings } from '../../lib/api/hooks';
 import { AllianceIcon, GuideIcon, ProfileIcon, ServerIcon, StatisticsIcon } from './NavIcons';
 
 const NAV_ITEMS: { to: string; icon: ReactNode; label: string }[] = [
@@ -15,14 +15,16 @@ const NAV_ITEMS: { to: string; icon: ReactNode; label: string }[] = [
 export function Sidebar({ open, onNavigate }: { open?: boolean; onNavigate?: () => void }) {
   const { user, logout } = useAuth();
   const { data: profile } = useProfile();
+  const { data: settings } = useSettings();
   const displayNick = profile?.nick ?? user?.nick ?? 'Гость';
+  const allianceName = settings?.allianceName ?? DEFAULT_ALLIANCE_NAME;
 
   return (
     <nav className={`sidebar${open ? ' open' : ''}`}>
       <div className="sb-brand">
         <div className="sb-tag">Alliance Dashboard</div>
         <div className="sb-title">Remedium</div>
-        <div className="sb-sub">// [IRON] ЦАРСТВО</div>
+        <div className="sb-sub">// {allianceName}</div>
       </div>
       <div className="nav-grp">Разделы</div>
       {NAV_ITEMS.map((item) => (

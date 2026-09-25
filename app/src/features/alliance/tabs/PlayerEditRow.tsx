@@ -18,13 +18,16 @@ export function PlayerEditRow({
   onCancel: () => void;
 }) {
   const { user } = useAuth();
-  const canEditGroup = !initial?.isSelf || (user?.canEdit ?? false);
+  const canEdit = user?.canEdit ?? false;
+  const canEditGroup = !initial?.isSelf || canEdit;
 
   const [nick, setNick] = useState(initial?.nick ?? '');
   const [level, setLevel] = useState(initial?.level ?? 1);
   const [group, setGroup] = useState<PlayerGroup>(initial?.group ?? 'R1');
   const [totalPowerM, setTotalPowerM] = useState(initial?.totalPowerM ?? 0);
   const [playstyle, setPlaystyle] = useState<Playstyle>(initial?.playstyle ?? 'none');
+  const [coordsX, setCoordsX] = useState(initial?.coordsX?.toString() ?? '');
+  const [coordsY, setCoordsY] = useState(initial?.coordsY?.toString() ?? '');
 
   return (
     <tr>
@@ -86,6 +89,30 @@ export function PlayerEditRow({
           ))}
         </select>
       </td>
+      <td>
+        {canEdit ? (
+          <div style={{ display: 'flex', gap: 4 }}>
+            <input
+              className="auth-input"
+              type="number"
+              placeholder="X"
+              value={coordsX}
+              onChange={(e) => setCoordsX(e.target.value)}
+            />
+            <input
+              className="auth-input"
+              type="number"
+              placeholder="Y"
+              value={coordsY}
+              onChange={(e) => setCoordsY(e.target.value)}
+            />
+          </div>
+        ) : (
+          <span style={{ color: 'var(--text2)', fontSize: 13 }} title="Координаты меняет только редактор">
+            {initial?.coordsX != null && initial?.coordsY != null ? `${initial.coordsX}:${initial.coordsY}` : '—'}
+          </span>
+        )}
+      </td>
       <td className="tbl-actions">
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
           <Button
@@ -103,6 +130,8 @@ export function PlayerEditRow({
                 group,
                 totalPowerM: initial?.isSelf ? initial.totalPowerM : totalPowerM,
                 playstyle,
+                coordsX: canEdit ? (coordsX.trim() === '' ? null : Number(coordsX)) : (initial?.coordsX ?? null),
+                coordsY: canEdit ? (coordsY.trim() === '' ? null : Number(coordsY)) : (initial?.coordsY ?? null),
               });
             }}
           >
